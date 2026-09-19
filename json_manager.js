@@ -1,128 +1,7 @@
-// =============================
-// DANH SÁCH BÁO CÁO - INDEXEDDB
-// =============================
-
-const DB_NAME = "BaoCaoViPhamDB";
-const DB_VERSION = 1;
-const STORE_NAME = "baoCao"; // mỗi record: { name: "example.json", content: "<json text>" }
-
-let dbInstance = null;
-
-function openDB() {
-    return new Promise((resolve, reject) => {
-        if (dbInstance) {
-            resolve(dbInstance);
-            return;
-        }
-
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: "name" });
-            }
-        };
-
-        request.onsuccess = (event) => {
-            dbInstance = event.target.result;
-            resolve(dbInstance);
-        };
-
-        request.onerror = (event) => {
-            reject(event.target.error);
-        };
-    });
-}
-
-// Lấy toàn bộ danh sách báo cáo
-async function getAllReports() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.getAll();
-
-        request.onsuccess = () => resolve(request.result || []);
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
-
-// Lấy 1 báo cáo theo tên file
-async function getReport(name) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(name);
-
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
-
-// Lưu (tạo mới / ghi đè) 1 báo cáo
-async function putReport(name, content) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        store.put({ name, content });
-
-        tx.oncomplete = () => resolve();
-        tx.onerror = (event) => reject(event.target.error);
-    });
-}
-
-// Xóa 1 báo cáo
-async function deleteReport(name) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        store.delete(name);
-
-        tx.oncomplete = () => resolve();
-        tx.onerror = (event) => reject(event.target.error);
-    });
-}
-
-// Xóa toàn bộ báo cáo, trả về số lượng đã xóa
-async function deleteAllReports() {
-    const reports = await getAllReports();
-    const db = await openDB();
-
-    await new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        store.clear();
-
-        tx.oncomplete = () => resolve();
-        tx.onerror = (event) => reject(event.target.error);
-    });
-
-    return reports.length;
-}
-
-// ==========================
-// TRẠNG THÁI ỨNG DỤNG
-// ==========================
-
-// Không còn khái niệm "chọn thư mục" với IndexedDB, dữ liệu luôn sẵn sàng
-// sau khi trang được tải. Biến này giữ để tương thích với các đoạn code cũ
-// kiểm tra "đã sẵn sàng chưa".
-let dbReady = false;
-
-// Tên file (record) hiện đang được chọn trong editor (thay cho currentFileHandle)
-let currentFileName = null;
-
-// ==========================
-// XÓA TOÀN BỘ DỮ LIỆU BÁO CÁO
-// ==========================
-
-document.getElementById('btn-xoa-tat-ca')?.addEventListener('click', async function() {
-    if (!dbReady) {
-        alert("Dữ liệu chưa sẵn sàng, vui lòng tải lại trang.");
+// Xử lý sự kiện Xóa toàn bộ dữ liệu báo cáo
+document.getElementById('btn-xoa-tat-ca').addEventListener('click', async function() {
+    if (!folderHandle) {
+        alert("Chưa chọn thư mục.");
         return;
     }
 
@@ -132,14 +11,25 @@ document.getElementById('btn-xoa-tat-ca')?.addEventListener('click', async funct
         return;
     }
 
+    let soFileDaXoa = 0;
+
     try {
-        const soFileDaXoa = await deleteAllReports();
+        for await (const [name, handle] of folderHandle.entries()) {
+            if (
+                handle.kind === "file" &&
+                name.toLowerCase().endsWith(".json")
+            ) {
+                await folderHandle.removeEntry(name);
+                soFileDaXoa++;
+            }
+        }
 
         // Cập nhật danh sách file
-        await renderReportList();
+        await refreshFileList();
+        await hienThiDanhSachBaoCao();
 
         // Reset file hiện tại
-        currentFileName = null;
+        currentFileHandle = null;
 
         document.getElementById("fileName").value = "";
         document.getElementById("jsonInput").value = "";
@@ -151,6 +41,26 @@ document.getElementById('btn-xoa-tat-ca')?.addEventListener('click', async funct
     }
 });
 
+let folderHandle = null;
+let currentFileHandle = null;
+
+// CHỌN THƯ MỤC
+
+document.getElementById("chooseFolder").onclick = async () => {
+    try {
+        folderHandle = await window.showDirectoryPicker();
+        currentFileHandle = null;
+        await refreshFileList();
+        setStatus("📁 Đã chọn thư mục.");
+    } catch (error) {
+        // Người dùng bấm Cancel hoặc lỗi gì đó idk
+        console.log(error);
+    }
+};
+
+// Mảng lưu trữ danh sách file báo cáo để phục vụ truy xuất đồng bộ
+let dsBaoCaoHandles = [];
+
 // ==========================
 // HIỂN THỊ DANH SÁCH BÁO CÁO
 // ==========================
@@ -161,117 +71,79 @@ async function renderReportList() {
 
     container.innerHTML = "";
 
-    if (!dbReady) {
+    if (!folderHandle) {
         container.innerHTML = '<p class="empty-msg">Chưa chọn thư mục.</p>';
         return;
     }
 
     let found = false;
 
-    let reports;
-    try {
-        reports = await getAllReports();
-    } catch (error) {
-        console.error("Không thể đọc danh sách báo cáo:", error);
-        container.innerHTML = '<p class="empty-msg">Có lỗi khi tải dữ liệu.</p>';
-        return;
-    }
+    // Duyệt qua tất cả các file JSON trong thư mục
+    for await (const [name, handle] of folderHandle.entries()) {
+        if (
+            handle.kind === "file" &&
+            name.toLowerCase().endsWith(".json")
+        ) {
+            try {
+                const file = await handle.getFile();
+                const text = await file.text();
+                const item = JSON.parse(text);
 
-    // Duyệt qua tất cả các báo cáo JSON trong IndexedDB
-    for (const record of reports) {
-        const { name, content: text } = record;
+                found = true;
 
-        // 1. Parse JSON
-        let item;
-        try {
-            item = JSON.parse(text);
-        } catch (error) {
-            console.error(`Lỗi PARSE JSON ở báo cáo "${name}":`, error);
+                const card = document.createElement("div");
+                card.className = "report-card";
 
-            found = true;
-
-            const errorCard = document.createElement("div");
-            errorCard.className = "report-card";
-            errorCard.innerHTML = `
-                <div class="report-header">
-                    <div class="report-title">
-                        ⚠️ <strong>${name}</strong>
-                        <span class="report-time">JSON không hợp lệ</span>
+                card.innerHTML = `
+                    <div class="report-header">
+                        <div class="report-title">
+                            🏫 <strong>${item.phien.phong || 'Phòng Học Không Tên'}</strong> 
+                            <span class="report-time">⏰ ${item.phien.thoiDiemKiemTra || 'Chưa rõ thời gian'}</span>
+                        </div>
+                        <button class="btn-arrow">▼</button>
                     </div>
-                </div>
-            `;
-            container.appendChild(errorCard);
-            continue; // bỏ qua record này, sang record tiếp theo
-        }
 
-        // 2. Dựng card hiển thị
-        try {
-            found = true;
+                    <div class="report-detail" style="display: none;">
+                        <div class="detail-content">
+                            <p>
+                                <strong>⚡ Thiết bị quên tắt:</strong>
+                                ${item.dieuHoaQuenTat || 0} Điều hòa,
+                                ${item.quatQuenTat || 0} Quạt/Đèn
+                            </p>
 
-            const card = document.createElement("div");
-            card.className = "report-card";
+                            <p>
+                                <strong>📉 Điểm thi đua trừ:</strong>
+                                <span class="badge-red">
+                                    -${item.diemTru || 0} điểm
+                                </span>
+                            </p>
 
-            card.innerHTML = `
-                <div class="report-header">
-                    <div class="report-title">
-                        🏫 <strong>${item.phien?.phong || 'Phòng Học Không Tên'}</strong> 
-                        <span class="report-time">⏰ ${item.phien?.thoiDiemKiemTra || 'Chưa rõ thời gian'}</span>
+                            <p>
+                                <strong>💰 Ước tính lãng phí:</strong>
+                                <span class="badge-green">
+                                    ${item.langPhiUocTinh || '0 VNĐ'}
+                                </span>
+                            </p>
+
+                            <p>
+                                <strong>📝 Ghi chú từ AI / GV:</strong>
+                                ${item.ghiChu || 'Không có ghi chú'}
+                            </p>
+                        </div>
                     </div>
-                    <button class="btn-arrow">▼</button>
-                </div>
+                `;
 
-                <div class="report-detail" style="display: none;">
-                    <div class="detail-content">
-                        <p>
-                            <strong>⚡ Thiết bị quên tắt:</strong>
-                            ${item.dieuHoaQuenTat || 0} Điều hòa,
-                            ${item.quatQuenTat || 0} Quạt/Đèn
-                        </p>
+                // Gán sự kiện trực tiếp vào thẻ header của report-card
+                const header = card.querySelector(".report-header");
+                header.onclick = async (e) => {
+                    e.stopPropagation();
+                    await toggleReportDetail(handle, name, card);
+                };
 
-                        <p>
-                            <strong>📉 Điểm thi đua trừ:</strong>
-                            <span class="badge-red">
-                                -${item.diemTru || 0} điểm
-                            </span>
-                        </p>
-
-                        <p>
-                            <strong>💰 Ước tính lãng phí:</strong>
-                            <span class="badge-green">
-                                ${item.langPhiUocTinh || '0 VNĐ'}
-                            </span>
-                        </p>
-
-                        <p>
-                            <strong>📝 Ghi chú từ AI / GV:</strong>
-                            ${item.ghiChu || 'Không có ghi chú'}
-                        </p>
-                    </div>
-                </div>
-            `;
-
-            // Gán sự kiện trực tiếp vào thẻ header của report-card
-            const header = card.querySelector(".report-header");
-            header.onclick = async (e) => {
-                e.stopPropagation();
-                await toggleReportDetail(name, card);
-            };
-
-            container.appendChild(card);
-        } catch (error) {
-            console.error(`Lỗi HIỂN THỊ báo cáo "${name}":`, error);
-
-            const errorCard = document.createElement("div");
-            errorCard.className = "report-card";
-            errorCard.innerHTML = `
-                <div class="report-header">
-                    <div class="report-title">
-                        ⚠️ <strong>${name}</strong>
-                        <span class="report-time">Lỗi khi hiển thị</span>
-                    </div>
-                </div>
-            `;
-            container.appendChild(errorCard);
+                container.appendChild(card);
+            } catch (error) {
+                console.error(`Không thể mở hoặc parse file ${name}:`, error);
+            }
         }
     }
 
@@ -281,38 +153,33 @@ async function renderReportList() {
     }
 }
 
-async function toggleReportDetail(name, cardElement) {
+async function toggleReportDetail(handle, name, cardElement) {
     const detailEl = cardElement.querySelector(".report-detail");
     const arrowEl = cardElement.querySelector(".btn-arrow");
 
-    // 1. Mở báo cáo lên Editor (chỉ khi Editor tồn tại)
-    if (document.getElementById("fileName") && document.getElementById("jsonInput")) {
-        try {
-            const record = await getReport(name);
+    // 1. Mở file lên Editor
+    try {
+        const file = await handle.getFile();
+        const text = await file.text();
 
-            if (!record) {
-                setStatus("Không tìm thấy báo cáo.");
-                return;
-            }
+        document.getElementById("fileName").value = name;
+        document.getElementById("jsonInput").value = text;
 
-            document.getElementById("fileName").value = name;
-            document.getElementById("jsonInput").value = record.content;
+        currentFileHandle = handle;
 
-            currentFileName = name;
+        // Bỏ active của các phần tử cũ
+        document.querySelectorAll("#fileList li, .report-card")
+            .forEach(el => el.classList.remove("selected"));
 
-            document.querySelectorAll("#fileList li, .report-card")
-                .forEach(el => el.classList.remove("selected"));
+        cardElement.classList.add("selected");
 
-            cardElement.classList.add("selected");
-
-            setStatus?.("📄 Đã mở " + name);
-        } catch (error) {
-            console.error("Không thể mở báo cáo vào editor:", error);
-            setStatus?.("Không thể mở file.");
-        }
+        setStatus("📄 Đã mở " + name);
+    } catch (error) {
+        console.error("Không thể mở file vào editor:", error);
+        setStatus("Không thể mở file.");
     }
 
-    // 2. Toggle Viewer
+    // 2. Toggle trạng thái hiển thị của Viewer
     if (detailEl.style.display === "block") {
         detailEl.style.display = "none";
         if (arrowEl) arrowEl.innerText = "▼";
@@ -322,38 +189,35 @@ async function toggleReportDetail(name, cardElement) {
     }
 }
 
-// Khởi tạo IndexedDB ngay khi trang tải, không cần người dùng chọn thư mục
-window.onload = async () => {
-    try {
-        await openDB();
-        dbReady = true;
-    } catch (error) {
-        console.error("Không thể mở IndexedDB:", error);
-        alert("Không thể mở cơ sở dữ liệu.");
-        setStatus("Không thể mở cơ sở dữ liệu.");
-    }
+// Giữ nguyên tương thích tên hàm cũ (tôi lười đổi tên)
+async function refreshFileList() {
     await renderReportList();
-};
+}
+
+window.onload = renderReportList;
 
 // MỞ FILE
 
-async function openFile(name) {
+async function openFile(handle, name) {
     try {
-        const record = await getReport(name);
-
-        if (!record) {
-            setStatus("Không tìm thấy báo cáo.");
-            return;
-        }
+        const file = await handle.getFile();
+        const text = await file.text();
 
         document.getElementById("fileName").value = name;
-        document.getElementById("jsonInput").value = record.content;
+        document.getElementById("jsonInput").value = text;
 
-        currentFileName = name;
+        // ====================
+        // Phần này của code cũ để highlight file đang chọn, chưa được lắp vào code mới
 
-        // Xóa trạng thái selected cũ
-        document.querySelectorAll("#fileList li")
-            .forEach(li => li.classList.remove("selected"));
+        // currentFileHandle = handle;
+
+        // // Xóa trạng thái selected cũ
+        // document.querySelectorAll("#fileList li")
+        //     .forEach(li => li.classList.remove("selected"));
+
+        // element.classList.add("selected");
+
+        // ====================
 
         setStatus("📄 Đã mở " + name);
     } catch (error) {
@@ -365,8 +229,8 @@ async function openFile(name) {
 
 // FILE MỚI
 
-document.getElementById("newFile")?.addEventListener("click", () => {
-    currentFileName = null;
+document.getElementById("newFile").onclick = () => {
+    currentFileHandle = null;
 
     document.getElementById("fileName").value = "";
     document.getElementById("jsonInput").value =
@@ -379,14 +243,14 @@ document.getElementById("newFile")?.addEventListener("click", () => {
         .forEach(li => li.classList.remove("selected"));
 
     setStatus("Đang tạo file mới.");
-});
+};
 
 
 // LƯU FILE
 
-document.getElementById("saveFile")?.addEventListener("click", async () => {
-    if (!dbReady) {
-        alert("Dữ liệu chưa sẵn sàng, vui lòng tải lại trang.");
+document.getElementById("saveFile").onclick = async () => {
+    if (!folderHandle) {
+        alert("Hãy chọn thư mục trước.");
         return;
     }
 
@@ -420,15 +284,25 @@ document.getElementById("saveFile")?.addEventListener("click", async () => {
     }
 
 
-    // Tạo / cập nhật record trong IndexedDB
+    // Tạo / mở file
     try {
-        await putReport(fileName, text);
+        const fileHandle =
+            await folderHandle.getFileHandle(
+                fileName,
+                { create: true }
+            );
+
+        // Ghi file
+        const writable =
+            await fileHandle.createWritable();
+        await writable.write(text);
+        await writable.close();
 
         // Cập nhật trạng thái
-        currentFileName = fileName;
+        currentFileHandle = fileHandle;
         fileNameInput.value = fileName;
 
-        await renderReportList();
+        await refreshFileList();
 
         setStatus("Đã lưu " + fileName);
     } catch (error) {
@@ -438,17 +312,17 @@ document.getElementById("saveFile")?.addEventListener("click", async () => {
             error.message
         );
     }
-});
+};
 
 
 // XÓA FILE
 
-document.getElementById("deleteFile")?.addEventListener("click", async () => {
-    if (!dbReady) {
-        alert("Dữ liệu chưa sẵn sàng, vui lòng tải lại trang.");
+document.getElementById("deleteFile").onclick = async () => {
+    if (!folderHandle) {
+        alert("Hãy chọn thư mục trước.");
         return;
     }
-    if (!currentFileName) {
+    if (!currentFileHandle) {
         alert("Chưa chọn file.");
         return;
     }
@@ -463,14 +337,14 @@ document.getElementById("deleteFile")?.addEventListener("click", async () => {
     }
 
     try {
-        await deleteReport(fileName);
+        await folderHandle.removeEntry(fileName);
 
-        currentFileName = null;
+        currentFileHandle = null;
 
         document.getElementById("fileName").value = "";
         document.getElementById("jsonInput").value = "";
 
-        await renderReportList();
+        await refreshFileList();
 
         setStatus("Đã xóa " + fileName);
     } catch (error) {
@@ -480,7 +354,7 @@ document.getElementById("deleteFile")?.addEventListener("click", async () => {
             error.message
         );
     }
-});
+};
 
 
 // STATUS (dòng chữ nhỏ ở dưới)
@@ -489,3 +363,42 @@ function setStatus(message) {
     document.getElementById("status").textContent =
         message;
 }
+
+// ====================
+// -----
+// Cái thứ này là code cũ hiển thị danh sách file JSON, không cần quan tâm đâu
+// -----
+
+// async function refreshFileList() {
+//     const fileList = document.getElementById("fileList");
+
+//     fileList.innerHTML = "";
+
+//     if (!folderHandle) {
+//         fileList.innerHTML = "<li>Chưa chọn thư mục</li>";
+//         return;
+//     }
+
+//     let found = false;
+
+//     for await (const [name, handle] of folderHandle.entries()) {
+//         if (
+//             handle.kind === "file" &&
+//             name.toLowerCase().endsWith(".json")
+//         ) {
+//             found = true;
+
+//             const li = document.createElement("li");
+//             li.textContent = "📄 " + name;
+//             li.onclick = () => openFile(handle, name, li);
+
+//             fileList.appendChild(li);
+//         }
+//     }
+
+//     if (!found) {
+//         fileList.innerHTML = "<li>Không có file JSON</li>";
+//     }
+// }
+
+// ====================
