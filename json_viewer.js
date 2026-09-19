@@ -1,138 +1,1006 @@
-let folderHandle = null;
-let currentFileHandle = null;
+// ===============================
+// INDEXEDDB
+// ===============================
 
-// CHỌN THƯ MỤC
+const DB_NAME = "ecoaiDB";
+const DB_VERSION = 1;
+const STORE_NAME = "reports";
 
-document.getElementById("chooseFolder").onclick = async () => {
-    try {
-        folderHandle = await window.showDirectoryPicker();
-        currentFileHandle = null;
-        await refreshFileList();
-        setStatus("📁 Đã chọn thư mục.");
-    } catch (error) {
-        // Người dùng bấm Cancel hoặc lỗi gì đó idk
-        console.log(error);
-    }
-};
+let reports = [];
 
-// Mảng lưu trữ danh sách file báo cáo để phục vụ truy xuất đồng bộ
-let dsBaoCaoHandles = [];
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-// ==========================
-// HIỂN THỊ DANH SÁCH BÁO CÁO
-// ==========================
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
 
-async function renderReportList() {
-    const container = document.getElementById("list-bao-cao-container");
-    if (!container) return;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                const store = db.createObjectStore(STORE_NAME, {
+                    keyPath: "id",
+                });
 
-    container.innerHTML = "";
+                // Có thể thêm index nếu sau này cần tìm kiếm
+                store.createIndex("ngayKiemTra", "phien.ngayKiemTra", {
+                    unique: false,
+                });
 
-    if (!folderHandle) {
-        container.innerHTML = '<p class="empty-msg">Chưa chọn thư mục.</p>';
-        return;
-    }
+                store.createIndex("phong", "phien.phong", {
+                    unique: false,
+                });
 
-    let found = false;
-
-    // Duyệt qua tất cả các file JSON trong thư mục
-    for await (const [name, handle] of folderHandle.entries()) {
-        if (
-            handle.kind === "file" &&
-            name.toLowerCase().endsWith(".json")
-        ) {
-            try {
-                const file = await handle.getFile();
-                const text = await file.text();
-                const item = JSON.parse(text);
-
-                found = true;
-
-                const card = document.createElement("div");
-                card.className = "report-card";
-
-                card.innerHTML = `
-                    <div class="report-header">
-                        <div class="report-title">
-                            🏫 <strong>${item.phien.phong || 'Phòng Học Không Tên'}</strong> 
-                            <span class="report-time">⏰ ${item.phien.thoiDiemKiemTra || 'Chưa rõ thời gian'}</span>
-                        </div>
-                        <button class="btn-arrow">▼</button>
-                    </div>
-
-                    <div class="report-detail" style="display: none;">
-                        <div class="detail-content">
-                            <p>
-                                <strong>⚡ Thiết bị quên tắt:</strong>
-                                ${item.dieuHoaQuenTat || 0} Điều hòa,
-                                ${item.quatQuenTat || 0} Quạt/Đèn
-                            </p>
-
-                            <p>
-                                <strong>📉 Điểm thi đua trừ:</strong>
-                                <span class="badge-red">
-                                    -${item.diemTru || 0} điểm
-                                </span>
-                            </p>
-
-                            <p>
-                                <strong>💰 Ước tính lãng phí:</strong>
-                                <span class="badge-green">
-                                    ${item.langPhiUocTinh || '0 VNĐ'}
-                                </span>
-                            </p>
-
-                            <p>
-                                <strong>📝 Ghi chú từ AI / GV:</strong>
-                                ${item.ghiChu || 'Không có ghi chú'}
-                            </p>
-                        </div>
-                    </div>
-                `;
-
-                // Gán sự kiện trực tiếp vào thẻ header của report-card
-                const header = card.querySelector(".report-header");
-                header.onclick = async (e) => {
-                    e.stopPropagation();
-                    await toggleReportDetail(handle, name, card);
-                };
-
-                container.appendChild(card);
-            } catch (error) {
-                console.error(`Không thể mở hoặc parse file ${name}:`, error);
+                store.createIndex("lopNhom", "phien.lopNhom", {
+                    unique: false,
+                });
             }
+        };
+
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+
+// ===============================
+// LẤY TOÀN BỘ REPORT
+// ===============================
+
+async function getReports() {
+    const db = await openDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+}
+// ===============================
+// DOM
+// ===============================
+
+const jsonInput = document.getElementById("jsonInput");
+const btn = document.getElementById("btn");
+const reportList = document.getElementById("reportList");
+
+// // ===============================
+// // LƯU REPORT
+// // ===============================
+
+// async function saveReport(report) {
+//     const db = await openDB();
+
+//     return new Promise((resolve, reject) => {
+//         const transaction = db.transaction(STORE_NAME, "readwrite");
+
+//         const store = transaction.objectStore(STORE_NAME);
+
+//         const request = store.put(report);
+
+//         request.onsuccess = () => {
+//             resolve();
+//         };
+
+//         request.onerror = () => {
+//             reject(request.error);
+//         };
+//     });
+// }
+
+// // ===============================
+// // XÓA REPORT
+// // ===============================
+
+// async function deleteReport(id) {
+//     const db = await openDB();
+
+//     return new Promise((resolve, reject) => {
+//         const transaction = db.transaction(STORE_NAME, "readwrite");
+
+//         const store = transaction.objectStore(STORE_NAME);
+
+//         const request = store.delete(id);
+
+//         request.onsuccess = () => {
+//             resolve();
+//         };
+
+//         request.onerror = () => {
+//             reject(request.error);
+//         };
+//     });
+// }
+
+
+// // ===============================
+// // THÊM REPORT
+// // ===============================
+
+// btn.addEventListener("click", async () => {
+//     let rawJSON = jsonInput.value.trim();
+
+//     // Xử lý JSON nằm trong ```json ... ```
+//     if (rawJSON.startsWith("```json") && rawJSON.endsWith("```")) {
+//         rawJSON = rawJSON
+//             .replace(/^```json/, "")
+//             .replace(/```$/, "")
+//             .trim();
+//     }
+
+//     if (!rawJSON) {
+//         alert("Vui lòng nhập JSON!");
+//         return;
+//     }
+
+//     try {
+//         const data = JSON.parse(rawJSON);
+
+//         // Tạo ID
+//         data.id = crypto.randomUUID();
+
+//         // Lưu IndexedDB
+//         await saveReport(data);
+
+//         // Thêm vào đầu mảng hiện tại
+//         reports.unshift(data);
+
+//         // Render
+//         renderReports();
+
+//         // Xóa textarea
+//         jsonInput.value = "";
+//     } catch (error) {
+//         alert("JSON không hợp lệ!");
+//         console.error(error);
+//     }
+// });
+
+// ===============================
+// RENDER REPORTS
+// ===============================
+
+function renderReports() {
+    reportList.innerHTML = reports
+        .map((report, index) => {
+            const p = report.phien || {};
+            const tb = report.thietBi || {};
+            const kq = report.ketQua || {};
+
+            const reportId = report.id || "N/A";
+
+            const reportDate = p.ngayKiemTra || "N/A";
+
+            const reportTime = p.thoiDiemKiemTra || "N/A";
+
+            const actions = [
+                ...(report.hanhDong?.hocSinh || []),
+                ...(report.hanhDong?.giaoVien || []),
+                ...(report.hanhDong?.clb || []),
+                ...(report.hanhDong?.nhom || []),
+                ...(report.hanhDong?.khac || []),
+            ];
+
+            const badgeClass =
+                kq.mucDoLangPhi === "CAO"
+                    ? "bg-danger-subtle text-danger"
+                    : kq.mucDoLangPhi === "TRUNG BÌNH"
+                        ? "bg-warning-subtle text-warning-emphasis"
+                        : kq.mucDoLangPhi === "THẤP"
+                        ? "bg-primary-subtle text-primary-emphasis"
+                        : "bg-success-subtle text-success";
+
+            return `
+        <div class="col-12 mb-4">
+
+          <div
+            class="card border-0 overflow-hidden"
+            style="
+              border-radius:20px;
+              box-shadow:
+                0 2px 4px rgba(0,0,0,.04),
+                0 8px 20px rgba(0,0,0,.06),
+                0 20px 45px rgba(0,0,0,.08);
+            "
+          >
+
+            <!-- HEADER -->
+
+            <div
+              class="card-header border-0 bg-white px-4 py-3"
+              data-bs-toggle="collapse"
+              data-bs-target="#report-${index}"
+              role="button"
+              style="cursor:pointer;"
+            >
+
+              <div
+                class="d-flex justify-content-between align-items-center"
+              >
+
+                <div
+                  class="d-flex align-items-center gap-3"
+                >
+
+                  <div
+                    class="
+                      d-flex
+                      align-items-center
+                      justify-content-center
+                    "
+                    style="
+                      width:46px;
+                      height:46px;
+                      border-radius:14px;
+                      background:#f4f5f7;
+                      box-shadow:
+                        inset 0 1px 2px rgba(0,0,0,.04),
+                        0 4px 12px rgba(0,0,0,.06);
+                    "
+                  >
+                    ⚡
+                  </div>
+
+                  <div>
+
+                    <h5 class="mb-1 fw-semibold">
+                      ${p.phong || "Không có dữ liệu"}
+                    </h5>
+
+                    <div class="text-muted small">
+                      ${p.lopNhom || "N/A"}
+                      ·
+                      ${p.donViSuDung || "N/A"}
+                    </div>
+
+                    <div
+                      class="text-muted"
+                      style="font-size:.7rem;"
+                    >
+                      ${reportDate}
+                      ·
+                      ${reportTime}
+                      ·
+                      ID: ${reportId}
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- MỨC ĐỘ -->
+
+                <span
+                  class="
+                    badge
+                    rounded-pill
+                    px-3
+                    py-2
+                    ${badgeClass}
+                  "
+                  style="
+                    font-size:.7rem;
+                    font-weight:600;
+                  "
+                >
+                  ${kq.mucDoLangPhi || "N/A"}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- CONTENT -->
+
+            <div
+              id="report-${index}"
+              class="collapse"
+            >
+
+              <div
+                class="
+                  card-body
+                  bg-light-subtle
+                  px-4
+                  pb-4
+                  pt-2
+                "
+              >
+
+                <!-- THÔNG TIN PHIÊN -->
+
+                <div
+                  class="
+                    bg-white
+                    rounded-4
+                    p-4
+                    mb-3
+                  "
+                  style="
+                    box-shadow:
+                      0 1px 3px rgba(0,0,0,.03),
+                      0 6px 18px rgba(0,0,0,.04);
+                  "
+                >
+
+                  <h6 class="fw-semibold mb-3">
+                    Thông tin phiên
+                  </h6>
+
+                  <div class="row g-3">
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Giáo viên quản lí
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.giaoVienQuanLi || "N/A"}
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Đơn vị sử dụng
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.donViSuDung || "N/A"}
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Thời gian sử dụng
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.thoiGianBatDau || "N/A"}
+                        –
+                        ${p.thoiGianKetThuc || "N/A"}
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Thời điểm kiểm tra
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.thoiDiemKiemTra || "Không có dữ liệu"}
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Mục đích sử dụng
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.mucDichSuDung || "N/A"}
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                      <div class="text-muted small">
+                        Số người có mặt
+                      </div>
+
+                      <div class="fw-medium">
+                        ${p.soNguoiCoMat ?? "N/A"}
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                  ${p.ghiChuThem
+                    ? `
+                        <div
+                          class="
+                            mt-3
+                            pt-3
+                            border-top
+                          "
+                        >
+
+                          <div
+                            class="
+                              text-muted
+                              small
+                              mb-1
+                            "
+                          >
+                            Ghi chú
+                          </div>
+
+                          <div>
+                            ${p.ghiChuThem}
+                          </div>
+
+                        </div>
+                      `
+                    : ""
+                }
+
+                </div>
+
+
+                <!-- THIẾT BỊ -->
+
+                <div
+                  class="
+                    bg-white
+                    rounded-4
+                    p-4
+                    mb-3
+                  "
+                  style="
+                    box-shadow:
+                      0 1px 3px rgba(0,0,0,.03),
+                      0 6px 18px rgba(0,0,0,.04);
+                  "
+                >
+
+                  <h6 class="fw-semibold mb-3">
+                    Trạng thái thiết bị
+                  </h6>
+
+                  <div class="row g-3">
+
+                    ${createDevice("Đèn", tb.den)}
+
+                    ${createDevice("Máy chiếu", tb.mayChieu)}
+
+                    ${createDevice("Điều hòa", tb.dieuHoa)}
+
+                    ${createDevice("Quạt", tb.quat)}
+
+                    ${createDevice("Máy tính", tb.mayTinh, tb.mayTinhConBat)}
+
+                    ${tb.thietBiKhac
+                    ? `
+                          <div class="col-6 col-md-4">
+
+                            <div
+                              class="rounded-3 p-3"
+                              style="
+                                background:
+                                  rgba(108,117,125,.07);
+
+                                box-shadow:
+                                  0 4px 12px
+                                  rgba(108,117,125,.08);
+                              "
+                            >
+
+                              <small
+                                class="
+                                  text-muted
+                                  d-block
+                                  mb-1
+                                "
+                              >
+                                Thiết bị khác
+                              </small>
+
+                              <strong>
+                                ${tb.thietBiKhac}
+                              </strong>
+
+                            </div>
+
+                          </div>
+                        `
+                    : ""
+                }
+
+                  </div>
+
+                </div>
+
+
+                <!-- ĐÁNH GIÁ -->
+
+                <div
+                  class="
+                    bg-white
+                    rounded-4
+                    p-4
+                    mb-3
+                  "
+                  style="
+                    box-shadow:
+                      0 1px 3px rgba(0,0,0,.03),
+                      0 8px 22px rgba(0,0,0,.05);
+                  "
+                >
+
+                  <div
+                    class="
+                      d-flex
+                      justify-content-between
+                      align-items-center
+                      mb-3
+                    "
+                  >
+
+                    <h6 class="fw-semibold mb-0">
+                      Đánh giá
+                    </h6>
+
+                    <span
+                      class="
+                        badge
+                        rounded-pill
+                        ${badgeClass}
+                      "
+                      style="font-size:.7rem;"
+                    >
+                      ${kq.mucDoLangPhi || "N/A"}
+                    </span>
+
+                  </div>
+
+
+                  <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                      <div class="text-muted small">
+                        Điểm thi đua
+                      </div>
+
+                      <div class="fs-3 fw-bold">
+                        ${kq.diemThiDua ?? "N/A"}
+                      </div>
+
+                    </div>
+
+
+                    <div class="col-md-8">
+
+                      <div class="text-muted small">
+                        Loại điểm
+                      </div>
+
+                      <div class="fw-medium">
+                        ${kq.loaiDiem || "N/A"}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  ${kq.canCu
+                    ? `
+                        <div
+                          class="
+                            mt-3
+                            pt-3
+                            border-top
+                          "
+                        >
+
+                          <div
+                            class="
+                              text-muted
+                              small
+                              mb-1
+                            "
+                          >
+                            Căn cứ đánh giá
+                          </div>
+
+                          <div class="text-secondary">
+                            ${kq.canCu}
+                          </div>
+
+                        </div>
+                      `
+                    : ""
+                }
+
+
+                  ${kq.viphamLapLai !== undefined
+                    ? `
+                        <div class="mt-3">
+
+                          <span class="text-muted small">
+                            Vi phạm lặp lại:
+                          </span>
+
+                          <strong>
+                            ${kq.viphamLapLai ? "Có" : "Không"}
+                          </strong>
+
+                        </div>
+                      `
+                    : ""
+                }
+
+                </div>
+
+
+                <!-- HÀNH ĐỘNG -->
+
+                <div
+                  class="
+                    bg-white
+                    rounded-4
+                    p-4
+                    mb-3
+                  "
+                  style="
+                    box-shadow:
+                      0 1px 3px rgba(0,0,0,.03),
+                      0 6px 18px rgba(0,0,0,.04);
+                  "
+                >
+
+                  <h6 class="fw-semibold mb-3">
+                    Hành động khuyến nghị
+                  </h6>
+
+                  ${actions.length
+                    ? `
+                        <div
+                          class="
+                            d-flex
+                            flex-column
+                            gap-2
+                          "
+                        >
+
+                          ${actions
+                        .map(
+                            (action) => `
+                                <div
+                                  class="
+                                    d-flex
+                                    gap-2
+                                    align-items-start
+                                  "
+                                >
+
+                                  <span class="text-success">
+                                    ✓
+                                  </span>
+
+                                  <span>
+                                    ${action}
+                                  </span>
+
+                                </div>
+                              `,
+                        )
+                        .join("")}
+
+                        </div>
+                      `
+                    : `
+                        <div class="text-muted">
+                          Không có hành động.
+                        </div>
+                      `
+                }
+
+                </div>
+
+
+                <!-- THÔNG ĐIỆP VẬN ĐỘNG -->
+
+                ${report.thongDiepVanDong
+                    ? `
+                      <div
+                        class="
+                          rounded-4
+                          p-4
+                          mb-3
+                        "
+                        style="
+                          background:
+                            linear-gradient(
+                              135deg,
+                              rgba(13,110,253,.06),
+                              rgba(25,135,84,.05)
+                            );
+
+                          box-shadow:
+                            0 1px 3px
+                            rgba(0,0,0,.03),
+
+                            0 8px 24px
+                            rgba(13,110,253,.08);
+                        "
+                      >
+
+                        <div
+                          class="
+                            d-flex
+                            align-items-center
+                            gap-2
+                            mb-3
+                          "
+                        >
+
+                          <div
+                            class="
+                              d-flex
+                              align-items-center
+                              justify-content-center
+                            "
+                            style="
+                              width:36px;
+                              height:36px;
+                              border-radius:11px;
+                              background:
+                                rgba(13,110,253,.10);
+                            "
+                          >
+                            💡
+                          </div>
+
+                          <h6 class="fw-semibold mb-0">
+                            Thông điệp vận động
+                          </h6>
+
+                        </div>
+
+
+                        ${report.thongDiepVanDong.tieuDe
+                        ? `
+                              <h5
+                                class="
+                                  fw-semibold
+                                  mb-2
+                                "
+                              >
+                                ${report.thongDiepVanDong.tieuDe}
+                              </h5>
+                            `
+                        : ""
+                    }
+
+
+                        ${report.thongDiepVanDong.thongDiep
+                        ? `
+                              <p
+                                class="
+                                  text-secondary
+                                  mb-3
+                                "
+                              >
+                                ${report.thongDiepVanDong.thongDiep}
+                              </p>
+                            `
+                        : ""
+                    }
+
+
+                        ${report.thongDiepVanDong.viecNhoMoiNgay?.length
+                        ? `
+                              <div class="mb-3">
+
+                                <div
+                                  class="
+                                    text-muted
+                                    small
+                                    fw-semibold
+                                    mb-2
+                                  "
+                                >
+                                  Việc nhỏ mỗi ngày
+                                </div>
+
+                                <div
+                                  class="
+                                    d-flex
+                                    flex-column
+                                    gap-2
+                                  "
+                                >
+
+                                  ${report.thongDiepVanDong.viecNhoMoiNgay
+                            .map(
+                                (item) => `
+                                        <div
+                                          class="
+                                            d-flex
+                                            gap-2
+                                            align-items-start
+                                          "
+                                        >
+
+                                          <span
+                                            class="
+                                              text-success
+                                              fw-bold
+                                            "
+                                          >
+                                            ✓
+                                          </span>
+
+                                          <span>
+                                            ${item}
+                                          </span>
+
+                                        </div>
+                                      `,
+                            )
+                            .join("")}
+
+                                </div>
+
+                              </div>
+                            `
+                        : ""
+                    }
+
+
+                        ${report.thongDiepVanDong.loiKeuGoi
+                        ? `
+                              <div
+                                class="
+                                  pt-3
+                                  border-top
+                                "
+                              >
+
+                                <strong>
+                                  ${report.thongDiepVanDong.loiKeuGoi}
+                                </strong>
+
+                              </div>
+                            `
+                        : ""
+                    }
+
+                      </div>
+                    `
+                    : ""
+                }
+
+
+                <!-- KẾT LUẬN -->
+
+                <div
+                  class="
+                    rounded-4
+                    p-4
+                  "
+                  style="
+                    background:#f8f9fa;
+
+                    box-shadow:
+                      inset 0 1px 2px
+                      rgba(0,0,0,.03),
+
+                      0 4px 14px
+                      rgba(0,0,0,.04);
+                  "
+                >
+
+                  <h6 class="fw-semibold mb-2">
+                    Kết luận
+                  </h6>
+
+                  <p
+                    class="
+                      mb-0
+                      text-secondary
+                    "
+                  >
+                    ${report.ketLuan || "Không có dữ liệu"}
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+        })
+        .join("");
+}
+
+// ===============================
+// DEVICE CARD
+// ===============================
+
+function createDevice(name, status, count = null) {
+    const isOn = status === "Bật";
+
+    return `
+    <div class="col-6 col-md-4">
+
+      <div
+        class="rounded-3 p-3"
+        style="
+          background:
+            ${isOn ? "rgba(25,135,84,.08)" : "rgba(108,117,125,.07)"};
+
+          box-shadow:
+            0 4px 12px
+            ${isOn ? "rgba(25,135,84,.12)" : "rgba(108,117,125,.08)"};
+        "
+      >
+
+        <small
+          class="
+            text-muted
+            d-block
+            mb-1
+          "
+        >
+          ${name}
+        </small>
+
+        <strong>
+          ${status || "Không có dữ liệu"}
+        </strong>
+
+        ${count
+            ? `
+              <small
+                class="
+                  text-muted
+                  ms-1
+                "
+              >
+                (${count} máy)
+              </small>
+            `
+            : ""
         }
+
+      </div>
+
+    </div>
+  `;
+}
+
+// ===============================
+// KHỞI ĐỘNG
+// ===============================
+
+async function init() {
+    try {
+        // Đọc toàn bộ dữ liệu từ IndexedDB
+        reports = await getReports();
+
+        // Mới nhất lên đầu
+        reports.reverse();
+
+        renderReports();
+    } catch (error) {
+        console.error("Không thể mở IndexedDB:", error);
+
+        alert("Không thể tải dữ liệu báo cáo!");
     }
-
-    if (!found) {
-        container.innerHTML =
-            '<p class="empty-msg">Chưa có dữ liệu báo cáo vi phạm nào được ghi nhận.</p>';
-    }
 }
 
-async function toggleReportDetail(handle, name, cardElement) {
-    const detailEl = cardElement.querySelector(".report-detail");
-    const arrowEl = cardElement.querySelector(".btn-arrow");
-
-    if (detailEl.style.display === "block") {
-        detailEl.style.display = "none";
-        if (arrowEl) arrowEl.innerText = "▼";
-    } else {
-        detailEl.style.display = "block";
-        if (arrowEl) arrowEl.innerText = "▲";
-    }
-}
-
-// Giữ nguyên tương thích tên hàm cũ (tôi lười đổi tên)
-async function refreshFileList() {
-    await renderReportList();
-}
-
-window.onload = renderReportList;
-
-// STATUS (dòng chữ nhỏ ở dưới)
-
-function setStatus(message) {
-    document.getElementById("status").textContent =
-        message;
-}
+init();

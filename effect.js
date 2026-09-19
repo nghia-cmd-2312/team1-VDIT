@@ -9,7 +9,7 @@ document.getElementById('menu-toggle')?.addEventListener('click', function() {
 const partyRockURL = 'https://partyrock.aws/u/khanh1104/M7J5-3r33';
 
 // Xử lý sự kiện mở link PartyRock
-document.getElementById('btn-mo-partyrock-admin').addEventListener('click', function() {
+document.getElementById('btn-mo-partyrock-admin')?.addEventListener('click', function() {
     window.open(partyRockURL, '_blank');
 });
 

@@ -116,13 +116,11 @@ nav a:hover {
 /* --- CONTENT SECTIONS --- */
 .content-section {
     padding: 60px 5%;
-    max-width: 1000px;
     margin: 0 auto;
 }
 
 .content-section-big {
     padding: 60px 5%;
-    max-width: 1500px;
     margin: 0 auto;
 }
 
