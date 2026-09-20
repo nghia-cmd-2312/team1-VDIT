@@ -631,6 +631,7 @@ nav a:hover { color: var(--lime); }
 .status-pill { color: var(--lime); font-size: 10px; }
 .energy-number { margin-top: 55px; color: white; font-family: 'Space Grotesk', sans-serif; font-size: 96px; line-height: .85; letter-spacing: -6px; }
 .energy-number span { margin-left: 4px; color: var(--lime); font-size: 34px; letter-spacing: 0; }
+#energy-score { margin-left: 0; color: inherit; font-size: inherit; letter-spacing: inherit; }
 .energy-label { margin: 16px 0 23px; color: rgba(255,255,255,.72); font-size: 13px; }
 .meter { height: 8px; overflow: hidden; border-radius: 20px; background: rgba(255,255,255,.15); }
 .meter span { display: block; width: 78%; height: 100%; border-radius: inherit; background: var(--lime); }
@@ -739,11 +740,20 @@ footer { margin-top: 0; padding: 28px max(5%, calc((100vw - 1240px) / 2)); backg
     .banner { padding: 70px 5% 38px; }
     .banner h1 { font-size: clamp(40px, 11vw, 58px); letter-spacing: -1.8px; }
     .banner p { font-size: 14px; }
-    .hero-visual { min-height: 310px; }
-    .energy-panel { inset: 16% 0 14%; }
-    .energy-number { margin-top: 42px; font-size: 76px; }
-    .chip-save { right: -2%; }
-    .chip-class { left: -2%; }
+    .hero-visual { min-height: 350px; }
+    .energy-panel { inset: 15% 2% 18%; padding: 22px 20px; }
+    .energy-number { margin-top: 36px; font-size: 68px; }
+    .energy-number span { font-size: 27px; }
+    .energy-label { margin: 13px 0 18px; font-size: 12px; }
+    .panel-topline, .panel-bottomline { font-size: 10px; }
+    .panel-bottomline { gap: 10px; }
+    .panel-bottomline span { min-width: 0; }
+    .chip-save { top: 2%; right: 0; min-width: 136px; padding: 9px 10px; }
+    .chip-class { right: 0; bottom: 0; left: auto; min-width: 136px; padding: 9px 10px; }
+    .floating-chip { grid-template-columns: 27px 1fr; column-gap: 7px; }
+    .floating-chip span { width: 27px; height: 27px; }
+    .floating-chip strong { font-size: 12px; }
+    .floating-chip small { font-size: 9px; }
     .hero-scroll { margin-top: 35px; }
     .impact-strip { padding: 22px 0; }
     .impact-item { padding: 4px 12px; gap: 8px; font-size: 9px; }
