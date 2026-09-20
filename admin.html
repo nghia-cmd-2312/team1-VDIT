@@ -3,87 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Quản Lý Báo Cáo - THPT Việt Đức</title>
+    <title>Quanr lí báo cáo - Green Việt Đức</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style_JSON_manager.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="admin-page">
 
-    <!-- Header Trang Admin -->
     <header>
-        <div class="logo">⚙️ Admin Thi Đua - THPT Việt Đức</div>
+        <a class="logo" href="index.html" aria-label="Green Việt Đức - Trang chủ">
+            <span class="logo-mark">G</span>
+            <span>Green <strong>Việt Đức</strong></span>
+        </a>
         <nav>
-            <a href="index.html" class="nav-admin-btn">⬅ Quay lại Trang Học Sinh</a>
+            <span class="admin-role">Khu vực giáo viên</span>
+            <a href="index.html" class="nav-admin-btn">Về trang học sinh <span>↗</span></a>
         </nav>
     </header>
 
-    <!-- Nội dung chính dành cho Giáo viên -->
-    <section class="content-section json-section">
-        <div class="admin-card">
-            <h2>📥 CẬP NHẬT BÁO CÁO VI PHẠM TIẾT KIỆM ĐIỆN</h2>
-            <p class="admin-desc">Giáo viên bấm vào nút bên dưới để truy cập và sử dụng Trợ lý AI tính điểm thi đua:</p>
+    <main class="admin-shell">
+        <div class="admin-breadcrumb"><span>Green Việt Đức</span><i>/</i> Quản lí báo cáo</div>
+        <section class="admin-welcome">
+            <div>
+                <span class="admin-kicker">QUẢN LÍ BÁO CÁO</span>
+                <h1>Chào mừng trở lại,<br><em>thầy cô.</em></h1>
+                <p>Theo dõi, đánh giá và nuôi dưỡng thói quen sử dụng năng lượng có trách nhiệm trong từng lớp học.</p>
+            </div>
+            <div class="admin-date"><span class="date-dot"></span><div><strong>Hệ thống đang hoạt động</strong><small>Dữ liệu được lưu an toàn trên thiết bị</small></div></div>
+        </section>
 
-            <!-- 1. BLOCK TRỢ LÝ AI PARTYROCK CHỈ DÀNH CHO GIÁO VIÊN -->
-            <div class="partyrock-box">
-                <div class="partyrock-header">
-                    <span class="partyrock-icon">🤖</span>
-                    <div>
-                        <h3 style="margin: 0; color: #1b5e20;">Trợ Lý AI Tính Điểm Thi Đua (AWS PartyRock)</h3>
-                        <p style="margin: 0; font-size: 13px; color: #666;">Phát triển bởi Khánh & Đức dành cho Giáo viên / Ban thi đua</p>
+        <section class="admin-stats" aria-label="Tổng quan báo cáo">
+            <div class="admin-stat"><span class="stat-symbol">◫</span><div><strong id="report-count">--</strong><small>Báo cáo đã ghi nhận</small></div><b>↗</b></div>
+            <div class="admin-stat"><span class="stat-symbol lime-symbol">◎</span><div><strong>24/7</strong><small>Trực quan & minh bạch</small></div><b>●</b></div>
+            <div class="admin-stat"><span class="stat-symbol gold-symbol">✦</span><div><strong>AI</strong><small>Hỗ trợ chấm điểm</small></div><b>↗</b></div>
+        </section>
+
+        <section class="admin-ai-card">
+            <div class="ai-copy">
+                <div class="ai-badge"><span>✦</span> TRỢ LÝ AI</div>
+                <h2>Biến dữ liệu kiểm tra<br>thành <em>hành động rõ ràng.</em></h2>
+                <p>Nhờ AI hỗ trợ phân tích mức độ lãng phí và đề xuất điểm thi đua công bằng cho từng phòng học.</p>
+                <button id="btn-mo-partyrock-admin" class="btn-partyrock-admin">Mở trợ lý PartyRock <span>↗</span></button>
+            </div>
+            <div class="ai-visual" aria-hidden="true"><div class="ai-orbit"></div><div class="ai-core">✦</div><span class="ai-tag tag-one">Phân tích</span><span class="ai-tag tag-two">Đề xuất</span><span class="ai-tag tag-three">Cải thiện</span></div>
+        </section>
+
+        <section class="admin-danger-row">
+            <div><strong>Quản lý dữ liệu</strong><span>Xóa toàn bộ lịch sử khi bắt đầu chu kỳ thi đua mới.</span></div>
+            <button id="btn-xoa-tat-ca" class="btn-danger">Xóa lịch sử báo cáo <span>⌫</span></button>
+        </section>
+
+        <section id="danh-sach-bao-cao" class="admin-editor-section">
+            <div class="admin-section-heading"><div><span class="admin-kicker">02 / SỔ THEO DÕI</span><h2>Báo cáo vi phạm<br><em>& thi đua.</em></h2></div><p>Chọn một báo cáo để xem chi tiết hoặc tạo bản ghi mới từ JSON.</p></div>
+            <div class="wrapper admin-wrapper">
+                <div class="toolbar">
+                    <div class="toolbar-label"><span class="toolbar-live"></span> Nhật ký cập nhật</div>
+                    <div class="toolbar-actions"><button id="newReport" class="btn-primary"><span>＋</span> Báo cáo mới</button><button id="saveReport" class="btn-save"><span>✓</span> Lưu thay đổi</button><button id="deleteReport" class="btn-delete"><span>×</span> Xóa mục</button></div>
+                </div>
+                <div class="layout admin-layout">
+                    <aside>
+                        <div class="aside-heading"><div><strong>Danh sách báo cáo</strong><small>Phòng học & thời điểm kiểm tra</small></div><span id="report-total">0</span></div>
+                        <div id="list-bao-cao-container" class="report-list"><p class="empty-msg">Chưa có dữ liệu báo cáo nào.</p></div>
+                    </aside>
+                    <div class="json-editor-panel">
+                        <div class="editor-heading"><div><strong>Trình soạn thảo JSON</strong><small>Chỉnh sửa dữ liệu trực tiếp</small></div><span class="editor-status">JSON</span></div>
+                        <textarea id="jsonInput" placeholder="Dán dữ liệu JSON vào đây..." spellcheck="false"></textarea>
+                        <div class="editor-footer"><p id="status">Sẵn sàng nhận dữ liệu mới.</p><span>Ctrl + S để lưu nhanh</span></div>
                     </div>
                 </div>
-                <button id="btn-mo-partyrock-admin" class="btn-partyrock-admin">
-                    🚀 TRẢI NGHIỆM ỨNG DỤNG AI (TAB MỚI)
-                </button>
             </div>
-
-            <hr class="divider">
-
-            <!-- 2. NÚT XÓA TOÀN BỘ DỮ LIỆU BÁO CÁO -->
-            <button id="btn-xoa-tat-ca" class="btn-danger">
-                🗑️ Xóa Toàn Bộ Lịch Sử Báo Cáo
-            </button>
-        </div>
-    </section>
-
-
-    <!-- Trình quản lí file JSON -->
-    <section id="danh-sach-bao-cao" class="content-section-big">
-        <h2 class="section-title">📊 Lịch Sử Báo Cáo Vi Phạm & Thi Đua</h2>
-        <div class="wrapper">
-            <div class="toolbar">
-                <button id="newReport" class="btn-primary">➕ Mới</button>
-                <button id="saveReport" class="btn-primary">💾 Lưu</button>
-                <button id="deleteReport" class="btn-primary">🗑️ Xóa</button>
-            </div>
-            <div class="layout">
-                <aside>
-                    <p style="text-align: center; color: #666">Danh sách phòng học vi phạm</p>
-                    <p style="text-align: center; color: #666; margin-bottom: 30px;">(Nhấp vào từng thẻ để xem chi tiết):</p>
-                    
-                    <div id="list-bao-cao-container" class="report-list">
-                        <!-- Dữ liệu JS tự động hiển thị tại đây -->
-                    </div>
-                </aside>
-
-                <main>
-                    <textarea
-                        id="jsonInput"
-                        placeholder="Dán JSON vào đây..."
-                        spellcheck="false"
-                    ></textarea>
-
-                    <p id="status"></p>
-                </main>
-
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer>
-        <p>© Báo cáo Chấm điểm Thi đua - Trường THPT Việt Đức</p>
+        <div class="footer-inner"><div class="logo footer-logo"><span class="logo-mark">G</span><span>Green <strong>Việt Đức</strong></span></div><p>© 2024 Trung tâm điều hành · THPT Việt Đức</p><a href="#danh-sach-bao-cao">Đến sổ theo dõi ↓</a></div>
     </footer>
 
     <!-- JavaScript Trang Giáo Viên -->

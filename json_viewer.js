@@ -171,6 +171,37 @@ const reportList = document.getElementById("reportList");
 // RENDER REPORTS
 // ===============================
 
+function formatEnergy(wh) {
+  const kwh = Number(wh || 0) / 1000;
+  return `${kwh.toLocaleString("vi-VN", { maximumFractionDigits: 2 })} kWh`;
+}
+
+function formatCurrency(value) {
+  return `${Number(value || 0).toLocaleString("vi-VN")} đ`;
+}
+
+function updateEnergyHighlights(reportItems) {
+  const savedWh = reportItems.reduce(
+    (total, report) => total + Number(report.ketQua?.uocTinhTietKiem_Wh || 0),
+    0,
+  );
+  const savedVnd = reportItems.reduce(
+    (total, report) => total + Number(report.ketQua?.uocTinhTietKiem_VND || 0),
+    0,
+  );
+  const savedKwh = document.getElementById("energy-saved-kwh") || document.getElementById("student-saved-kwh");
+  const studentKwh = document.getElementById("student-saved-kwh");
+  const studentVnd = document.getElementById("student-saved-vnd");
+  const savedVndLabel = document.getElementById("energy-saved-vnd");
+  const reportCountLabel = document.getElementById("energy-report-count");
+
+  if (savedKwh) savedKwh.textContent = formatEnergy(savedWh);
+  if (studentKwh) studentKwh.textContent = formatEnergy(savedWh);
+  if (studentVnd) studentVnd.textContent = formatCurrency(savedVnd);
+  if (savedVndLabel) savedVndLabel.textContent = `Tiết kiệm ${formatCurrency(savedVnd)}`;
+  if (reportCountLabel) reportCountLabel.textContent = `${reportItems.length} báo cáo`;
+}
+
 function renderReports() {
     reportList.innerHTML = reports
         .map((report, index) => {
@@ -205,7 +236,7 @@ function renderReports() {
         <div class="col-12 mb-4">
 
           <div
-            class="card border-0 overflow-hidden"
+            class="card border-0 overflow-hidden report-card-modern"
             style="
               border-radius:20px;
               box-shadow:
@@ -218,7 +249,7 @@ function renderReports() {
             <!-- HEADER -->
 
             <div
-              class="card-header border-0 bg-white px-4 py-3"
+              class="card-header border-0 bg-white px-4 py-3 report-card-header"
               data-bs-toggle="collapse"
               data-bs-target="#report-${index}"
               role="button"
@@ -234,7 +265,7 @@ function renderReports() {
                 >
 
                   <div
-                    class="
+                    class="report-icon
                       d-flex
                       align-items-center
                       justify-content-center
@@ -254,25 +285,26 @@ function renderReports() {
 
                   <div>
 
-                    <h5 class="mb-1 fw-semibold">
+                    <div class="report-eyebrow">NHẬT KÝ TIẾT KIỆM ĐIỆN</div>
+                    <h5 class="mb-1 fw-semibold report-room">
                       ${p.phong || "Không có dữ liệu"}
                     </h5>
 
-                    <div class="text-muted small">
+                    <div class="text-muted small report-context">
                       ${p.lopNhom || "N/A"}
                       ·
                       ${p.donViSuDung || "N/A"}
                     </div>
 
                     <div
-                      class="text-muted"
+                      class="text-muted report-meta"
                       style="font-size:.7rem;"
                     >
                       ${reportDate}
                       ·
                       ${reportTime}
                       ·
-                      ID: ${reportId}
+                      ID: ${reportId.slice(0,8)}
                     </div>
 
                   </div>
@@ -283,7 +315,7 @@ function renderReports() {
                 <!-- MỨC ĐỘ -->
 
                 <span
-                  class="
+                  class="report-level
                     badge
                     rounded-pill
                     px-3
@@ -312,7 +344,7 @@ function renderReports() {
 
               <div
                 class="
-                  card-body
+                  card-body report-card-content
                   bg-light-subtle
                   px-4
                   pb-4
@@ -587,6 +619,24 @@ function renderReports() {
                       </div>
 
                     </div>
+
+                    ${kq.uocTinhTietKiem_Wh !== undefined || kq.uocTinhLangPhi_Wh !== undefined || kq.uocTinhTietKiem_VND !== undefined
+                    ? `
+                      <div class="col-12">
+                        <div class="report-impact-grid">
+                          ${kq.uocTinhTietKiem_Wh !== undefined
+                            ? `<div class="report-impact-item"><span>Điện có thể tiết kiệm</span><strong>${formatEnergy(kq.uocTinhTietKiem_Wh)}</strong></div>`
+                            : ""}
+                          ${kq.uocTinhLangPhi_Wh !== undefined
+                            ? `<div class="report-impact-item report-impact-waste"><span>Điện đang lãng phí</span><strong>${formatEnergy(kq.uocTinhLangPhi_Wh)}</strong></div>`
+                            : ""}
+                          ${kq.uocTinhTietKiem_VND !== undefined
+                            ? `<div class="report-impact-item report-impact-money"><span>Chi phí tiết kiệm ước tính</span><strong>${formatCurrency(kq.uocTinhTietKiem_VND)}</strong></div>`
+                            : ""}
+                        </div>
+                      </div>
+                    `
+                    : ""}
 
                   </div>
 
@@ -995,6 +1045,7 @@ async function init() {
         // Mới nhất lên đầu
         reports.reverse();
 
+        updateEnergyHighlights(reports);
         renderReports();
     } catch (error) {
         console.error("Không thể mở IndexedDB:", error);

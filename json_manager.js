@@ -93,6 +93,8 @@ async function deleteAllReports() {
 const jsonInput = document.getElementById("jsonInput");
 const reportList = document.getElementById("list-bao-cao-container");
 const status = document.getElementById("status");
+const reportCount = document.getElementById("report-count");
+const reportTotal = document.getElementById("report-total");
 
 function getReportTitle(report) {
     const session = report.phien || {};
@@ -108,6 +110,14 @@ function getReportDate(report) {
 
 function renderReportList() {
     reportList.innerHTML = "";
+
+    if (reportCount) {
+        reportCount.textContent = reports.length;
+    }
+
+    if (reportTotal) {
+        reportTotal.textContent = reports.length;
+    }
 
     if (!reports.length) {
         reportList.innerHTML =
