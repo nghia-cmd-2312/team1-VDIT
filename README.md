@@ -1,10 +1,8 @@
-## Thay đổi
-* Sửa UI
+Thay đổi trong AWS PartyRock:
+* Đưa phần input lên đầu hết cho tiện
+* Đưa JSON lên đầu
 
-## Hướng dẫn dùng
-1. Chọn file/Tạo file *(chọn file bằng cách click vào file)*
-2. Sửa
-3. Lưu/Xóa
-
-## Note:
-*Đã sửa UI (hoạt động trên điện thoại) và trình xem JSON đã tương thích với JSON của AI.*
+Thay đổi trên trang web:
+* Làm chữ to lên cho dễ nhìn
+* Đưa danh sách báo cáo lên đầu ở trang học sinh (vì nó quan trọng)
+* Làm nút *Xóa lịch sử báo cáo* dễ tìm hơn (thay đổi vị trí)

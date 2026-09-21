@@ -4,14 +4,6 @@ const STORE_NAME = "reports";
 
 let reports = [];
 let currentReportId = null;
-const reportsChannel = typeof BroadcastChannel !== "undefined"
-    ? new BroadcastChannel("green-viet-duc-reports")
-    : null;
-
-function notifyReportsChanged() {
-    reportsChannel?.postMessage({ type: "reports-changed" });
-    localStorage.setItem("green-viet-duc-reports-updated", String(Date.now()));
-}
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -116,28 +108,6 @@ function getReportDate(report) {
         .join(" · ") || "Chưa có thời gian";
 }
 
-function getReportTimestamp(report) {
-    const session = report.phien || {};
-    const date = String(session.ngayKiemTra || "").trim();
-    const time = String(session.thoiDiemKiemTra || "00:00").trim();
-    const match = date.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
-
-    if (!match) {
-        return 0;
-    }
-
-    const [, day, month, year] = match;
-    const [hours = "0", minutes = "0"] = time.split(":");
-    return new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes)).getTime();
-}
-
-function sortReportsNewestFirst(reportItems) {
-    return [...reportItems].sort((first, second) => {
-        const timestampDifference = getReportTimestamp(second) - getReportTimestamp(first);
-        return timestampDifference || String(second.id || "").localeCompare(String(first.id || ""));
-    });
-}
-
 function renderReportList() {
     reportList.innerHTML = "";
 
@@ -209,7 +179,7 @@ function setStatus(message) {
 }
 
 async function refreshReportList() {
-    reports = sortReportsNewestFirst(await getReports());
+    reports = (await getReports()).reverse();
     renderReportList();
 }
 
@@ -246,7 +216,6 @@ document.getElementById("saveReport").addEventListener("click", async () => {
         currentReportId = report.id;
         jsonInput.value = JSON.stringify(report, null, 4);
         await refreshReportList();
-        notifyReportsChanged();
         setStatus(`Đã lưu báo cáo ${getReportTitle(report)}.`);
     } catch (error) {
         console.error(error);
@@ -269,7 +238,6 @@ document.getElementById("deleteReport").addEventListener("click", async () => {
         currentReportId = null;
         jsonInput.value = "";
         await refreshReportList();
-        notifyReportsChanged();
         setStatus("Đã xóa báo cáo.");
     } catch (error) {
         console.error(error);
@@ -287,7 +255,6 @@ document.getElementById("btn-xoa-tat-ca").addEventListener("click", async () => 
         currentReportId = null;
         jsonInput.value = "";
         await refreshReportList();
-        notifyReportsChanged();
         setStatus("Đã xóa toàn bộ lịch sử báo cáo.");
     } catch (error) {
         console.error(error);

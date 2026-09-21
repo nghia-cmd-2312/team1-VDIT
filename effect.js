@@ -6,7 +6,7 @@ document.getElementById('menu-toggle')?.addEventListener('click', function() {
 // Hiển thị file báo cáo di cư hết sang json_manager.js rồi
 
 // Link PartyRock dành riêng cho Giáo viên
-const partyRockURL = 'https://partyrock.aws/u/khanh1104/M7J5-3r33';
+const partyRockURL = 'https://partyrock.aws/u/Nghia2312/v4h63iEvt/GreenVD';
 
 // Xử lý sự kiện mở link PartyRock
 document.getElementById('btn-mo-partyrock-admin')?.addEventListener('click', function() {
