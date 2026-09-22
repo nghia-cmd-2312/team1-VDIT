@@ -9,40 +9,40 @@ const STORE_NAME = "reports";
 let reports = [];
 
 function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
 
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                const store = db.createObjectStore(STORE_NAME, {
-                    keyPath: "id",
-                });
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, {
+          keyPath: "id",
+        });
 
-                // Có thể thêm index nếu sau này cần tìm kiếm
-                store.createIndex("ngayKiemTra", "phien.ngayKiemTra", {
-                    unique: false,
-                });
+        // Có thể thêm index nếu sau này cần tìm kiếm
+        store.createIndex("ngayKiemTra", "phien.ngayKiemTra", {
+          unique: false,
+        });
 
-                store.createIndex("phong", "phien.phong", {
-                    unique: false,
-                });
+        store.createIndex("phong", "phien.phong", {
+          unique: false,
+        });
 
-                store.createIndex("lopNhom", "phien.lopNhom", {
-                    unique: false,
-                });
-            }
-        };
+        store.createIndex("lopNhom", "phien.lopNhom", {
+          unique: false,
+        });
+      }
+    };
 
-        request.onsuccess = () => {
-            resolve(request.result);
-        };
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
 
-        request.onerror = () => {
-            reject(request.error);
-        };
-    });
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
 }
 
 // ===============================
@@ -50,22 +50,22 @@ function openDB() {
 // ===============================
 
 async function getReports() {
-    const db = await openDB();
+  const db = await openDB();
 
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, "readonly");
-        const store = transaction.objectStore(STORE_NAME);
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
 
-        const request = store.getAll();
+    const request = store.getAll();
 
-        request.onsuccess = () => {
-            resolve(request.result);
-        };
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
 
-        request.onerror = () => {
-            reject(request.error);
-        };
-    });
+    request.onerror = () => {
+      reject(request.error);
+    };
+  });
 }
 // ===============================
 // DOM
@@ -74,98 +74,6 @@ async function getReports() {
 const jsonInput = document.getElementById("jsonInput");
 const btn = document.getElementById("btn");
 const reportList = document.getElementById("reportList");
-
-// // ===============================
-// // LƯU REPORT
-// // ===============================
-
-// async function saveReport(report) {
-//     const db = await openDB();
-
-//     return new Promise((resolve, reject) => {
-//         const transaction = db.transaction(STORE_NAME, "readwrite");
-
-//         const store = transaction.objectStore(STORE_NAME);
-
-//         const request = store.put(report);
-
-//         request.onsuccess = () => {
-//             resolve();
-//         };
-
-//         request.onerror = () => {
-//             reject(request.error);
-//         };
-//     });
-// }
-
-// // ===============================
-// // XÓA REPORT
-// // ===============================
-
-// async function deleteReport(id) {
-//     const db = await openDB();
-
-//     return new Promise((resolve, reject) => {
-//         const transaction = db.transaction(STORE_NAME, "readwrite");
-
-//         const store = transaction.objectStore(STORE_NAME);
-
-//         const request = store.delete(id);
-
-//         request.onsuccess = () => {
-//             resolve();
-//         };
-
-//         request.onerror = () => {
-//             reject(request.error);
-//         };
-//     });
-// }
-
-
-// // ===============================
-// // THÊM REPORT
-// // ===============================
-
-// btn.addEventListener("click", async () => {
-//     let rawJSON = jsonInput.value.trim();
-
-//     // Xử lý JSON nằm trong ```json ... ```
-//     if (rawJSON.startsWith("```json") && rawJSON.endsWith("```")) {
-//         rawJSON = rawJSON
-//             .replace(/^```json/, "")
-//             .replace(/```$/, "")
-//             .trim();
-//     }
-
-//     if (!rawJSON) {
-//         alert("Vui lòng nhập JSON!");
-//         return;
-//     }
-
-//     try {
-//         const data = JSON.parse(rawJSON);
-
-//         // Tạo ID
-//         data.id = crypto.randomUUID();
-
-//         // Lưu IndexedDB
-//         await saveReport(data);
-
-//         // Thêm vào đầu mảng hiện tại
-//         reports.unshift(data);
-
-//         // Render
-//         renderReports();
-
-//         // Xóa textarea
-//         jsonInput.value = "";
-//     } catch (error) {
-//         alert("JSON không hợp lệ!");
-//         console.error(error);
-//     }
-// });
 
 // ===============================
 // RENDER REPORTS
@@ -200,39 +108,117 @@ function updateEnergyHighlights(reportItems) {
   if (studentVnd) studentVnd.textContent = formatCurrency(savedVnd);
   if (savedVndLabel) savedVndLabel.textContent = `Tiết kiệm ${formatCurrency(savedVnd)}`;
   if (reportCountLabel) reportCountLabel.textContent = `${reportItems.length} báo cáo`;
+  if (scoreLabel) scoreLabel.textContent = averageScore;
+  if (meterFill) meterFill.style.width = `${averageScore}%`;
+  if (classCountLabel) classCountLabel.textContent = `${classCount} lớp`;
 }
 
+function updateStudentRanking(reportItems) {
+  const rankingList = document.getElementById("rankingList");
+
+  if (!rankingList) {
+    return;
+  }
+
+  const groups = new Map();
+  reportItems.forEach((report) => {
+    const groupName = String(report.phien?.lopNhom || "").trim();
+    const result = report.ketQua || {};
+    const score = result.diemThiDua !== undefined
+      ? Number(result.diemThiDua)
+      : result.diemBiTru !== undefined
+        ? 100 - Number(result.diemBiTru)
+        : null;
+
+    if (!groupName || !Number.isFinite(score)) {
+      return;
+    }
+
+    const current = groups.get(groupName) || { total: 0, count: 0 };
+    current.total += score;
+    current.count += 1;
+    groups.set(groupName, current);
+  });
+
+  const ranking = [...groups.entries()]
+    .map(([name, value]) => ({ name, score: Math.round(value.total / value.count), count: value.count }))
+    .sort((first, second) => second.score - first.score || first.name.localeCompare(second.name, "vi"));
+
+  if (!ranking.length) {
+    rankingList.innerHTML = '<div class="ranking-empty">Bảng xếp hạng sẽ xuất hiện khi có báo cáo được xác nhận.</div>';
+    return;
+  }
+
+  rankingList.innerHTML = ranking
+    .map((item, index) => `
+      <div class="ranking-row">
+        <span class="ranking-rank">${String(index + 1).padStart(2, "0")}</span>
+        <div class="ranking-name"><strong>${item.name}</strong><small>${item.count} báo cáo đã xác nhận</small></div>
+        <div class="ranking-score">${item.score}<span>/100</span></div>
+        <div class="ranking-trend">● Đang theo dõi</div>
+      </div>
+    `)
+    .join("");
+}
+
+async function refreshViewerData() {
+  reports = sortReportsNewestFirst(await getReports());
+  updateEnergyHighlights(reports);
+  updateStudentRanking(reports);
+  renderReports();
+}
+
+reportsChannel?.addEventListener("message", () => {
+  refreshViewerData().catch((error) => console.error("Không thể đồng bộ báo cáo:", error));
+});
+
+window.addEventListener("storage", (event) => {
+  if (event.key === "green-viet-duc-reports-updated") {
+    refreshViewerData().catch((error) => console.error("Không thể đồng bộ báo cáo:", error));
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    refreshViewerData().catch((error) => console.error("Không thể làm mới báo cáo:", error));
+  }
+});
+
 function renderReports() {
-    reportList.innerHTML = reports
-        .map((report, index) => {
-            const p = report.phien || {};
-            const tb = report.thietBi || {};
-            const kq = report.ketQua || {};
+  if (!reportList) {
+    return;
+  }
 
-            const reportId = report.id || "N/A";
+  reportList.innerHTML = reports
+    .map((report, index) => {
+      const p = report.phien || {};
+      const tb = report.thietBi || {};
+      const kq = report.ketQua || {};
 
-            const reportDate = p.ngayKiemTra || "N/A";
+      const reportId = report.id || "N/A";
 
-            const reportTime = p.thoiDiemKiemTra || "N/A";
+      const reportDate = p.ngayKiemTra || "N/A";
 
-            const actions = [
-                ...(report.hanhDong?.hocSinh || []),
-                ...(report.hanhDong?.giaoVien || []),
-                ...(report.hanhDong?.clb || []),
-                ...(report.hanhDong?.nhom || []),
-                ...(report.hanhDong?.khac || []),
-            ];
+      const reportTime = p.thoiDiemKiemTra || "N/A";
 
-            const badgeClass =
-                kq.mucDoLangPhi === "CAO"
-                    ? "bg-danger-subtle text-danger"
-                    : kq.mucDoLangPhi === "TRUNG BÌNH"
-                        ? "bg-warning-subtle text-warning-emphasis"
-                        : kq.mucDoLangPhi === "THẤP"
-                        ? "bg-primary-subtle text-primary-emphasis"
-                        : "bg-success-subtle text-success";
+      const actions = [
+        ...(report.hanhDong?.hocSinh || []),
+        ...(report.hanhDong?.giaoVien || []),
+        ...(report.hanhDong?.clb || []),
+        ...(report.hanhDong?.nhom || []),
+        ...(report.hanhDong?.khac || []),
+      ];
 
-            return `
+      const badgeClass =
+        kq.mucDoLangPhi === "CAO"
+          ? "bg-danger-subtle text-danger"
+          : kq.mucDoLangPhi === "TRUNG BÌNH"
+            ? "bg-warning-subtle text-warning-emphasis"
+            : kq.mucDoLangPhi === "THẤP"
+              ? "bg-primary-subtle text-primary-emphasis"
+              : "bg-success-subtle text-success";
+
+      return `
         <div class="col-12 mb-4">
 
           <div
@@ -304,7 +290,7 @@ function renderReports() {
                       ·
                       ${reportTime}
                       ·
-                      ID: ${reportId.slice(0,8)}
+                      ID: ${reportId.slice(0, 8)}
                     </div>
 
                   </div>
@@ -445,7 +431,7 @@ function renderReports() {
 
 
                   ${p.ghiChuThem
-                    ? `
+          ? `
                         <div
                           class="
                             mt-3
@@ -470,8 +456,8 @@ function renderReports() {
 
                         </div>
                       `
-                    : ""
-                }
+          : ""
+        }
 
                 </div>
 
@@ -509,7 +495,7 @@ function renderReports() {
                     ${createDevice("Máy tính", tb.mayTinh, tb.mayTinhConBat)}
 
                     ${tb.thietBiKhac
-                    ? `
+          ? `
                           <div class="col-6 col-md-4">
 
                             <div
@@ -542,8 +528,8 @@ function renderReports() {
 
                           </div>
                         `
-                    : ""
-                }
+          : ""
+        }
 
                   </div>
 
@@ -621,28 +607,28 @@ function renderReports() {
                     </div>
 
                     ${kq.uocTinhTietKiem_Wh !== undefined || kq.uocTinhLangPhi_Wh !== undefined || kq.uocTinhTietKiem_VND !== undefined
-                    ? `
+          ? `
                       <div class="col-12">
                         <div class="report-impact-grid">
                           ${kq.uocTinhTietKiem_Wh !== undefined
-                            ? `<div class="report-impact-item"><span>Điện có thể tiết kiệm</span><strong>${formatEnergy(kq.uocTinhTietKiem_Wh)}</strong></div>`
-                            : ""}
+            ? `<div class="report-impact-item"><span>Điện có thể tiết kiệm</span><strong>${formatEnergy(kq.uocTinhTietKiem_Wh)}</strong></div>`
+            : ""}
                           ${kq.uocTinhLangPhi_Wh !== undefined
-                            ? `<div class="report-impact-item report-impact-waste"><span>Điện đang lãng phí</span><strong>${formatEnergy(kq.uocTinhLangPhi_Wh)}</strong></div>`
-                            : ""}
+            ? `<div class="report-impact-item report-impact-waste"><span>Điện đang lãng phí</span><strong>${formatEnergy(kq.uocTinhLangPhi_Wh)}</strong></div>`
+            : ""}
                           ${kq.uocTinhTietKiem_VND !== undefined
-                            ? `<div class="report-impact-item report-impact-money"><span>Chi phí tiết kiệm ước tính</span><strong>${formatCurrency(kq.uocTinhTietKiem_VND)}</strong></div>`
-                            : ""}
+            ? `<div class="report-impact-item report-impact-money"><span>Chi phí tiết kiệm ước tính</span><strong>${formatCurrency(kq.uocTinhTietKiem_VND)}</strong></div>`
+            : ""}
                         </div>
                       </div>
                     `
-                    : ""}
+          : ""}
 
                   </div>
 
 
                   ${kq.canCu
-                    ? `
+          ? `
                         <div
                           class="
                             mt-3
@@ -667,12 +653,12 @@ function renderReports() {
 
                         </div>
                       `
-                    : ""
-                }
+          : ""
+        }
 
 
                   ${kq.viphamLapLai !== undefined
-                    ? `
+          ? `
                         <div class="mt-3">
 
                           <span class="text-muted small">
@@ -685,8 +671,8 @@ function renderReports() {
 
                         </div>
                       `
-                    : ""
-                }
+          : ""
+        }
 
                 </div>
 
@@ -712,7 +698,7 @@ function renderReports() {
                   </h6>
 
                   ${actions.length
-                    ? `
+          ? `
                         <div
                           class="
                             d-flex
@@ -722,8 +708,8 @@ function renderReports() {
                         >
 
                           ${actions
-                        .map(
-                            (action) => `
+            .map(
+              (action) => `
                                 <div
                                   class="
                                     d-flex
@@ -742,17 +728,17 @@ function renderReports() {
 
                                 </div>
                               `,
-                        )
-                        .join("")}
+            )
+            .join("")}
 
                         </div>
                       `
-                    : `
+          : `
                         <div class="text-muted">
                           Không có hành động.
                         </div>
                       `
-                }
+        }
 
                 </div>
 
@@ -760,7 +746,7 @@ function renderReports() {
                 <!-- THÔNG ĐIỆP VẬN ĐỘNG -->
 
                 ${report.thongDiepVanDong
-                    ? `
+          ? `
                       <div
                         class="
                           rounded-4
@@ -818,7 +804,7 @@ function renderReports() {
 
 
                         ${report.thongDiepVanDong.tieuDe
-                        ? `
+            ? `
                               <h5
                                 class="
                                   fw-semibold
@@ -828,12 +814,12 @@ function renderReports() {
                                 ${report.thongDiepVanDong.tieuDe}
                               </h5>
                             `
-                        : ""
-                    }
+            : ""
+          }
 
 
                         ${report.thongDiepVanDong.thongDiep
-                        ? `
+            ? `
                               <p
                                 class="
                                   text-secondary
@@ -843,12 +829,12 @@ function renderReports() {
                                 ${report.thongDiepVanDong.thongDiep}
                               </p>
                             `
-                        : ""
-                    }
+            : ""
+          }
 
 
                         ${report.thongDiepVanDong.viecNhoMoiNgay?.length
-                        ? `
+            ? `
                               <div class="mb-3">
 
                                 <div
@@ -871,8 +857,8 @@ function renderReports() {
                                 >
 
                                   ${report.thongDiepVanDong.viecNhoMoiNgay
-                            .map(
-                                (item) => `
+              .map(
+                (item) => `
                                         <div
                                           class="
                                             d-flex
@@ -896,19 +882,19 @@ function renderReports() {
 
                                         </div>
                                       `,
-                            )
-                            .join("")}
+              )
+              .join("")}
 
                                 </div>
 
                               </div>
                             `
-                        : ""
-                    }
+            : ""
+          }
 
 
                         ${report.thongDiepVanDong.loiKeuGoi
-                        ? `
+            ? `
                               <div
                                 class="
                                   pt-3
@@ -922,13 +908,13 @@ function renderReports() {
 
                               </div>
                             `
-                        : ""
-                    }
+            : ""
+          }
 
                       </div>
                     `
-                    : ""
-                }
+          : ""
+        }
 
 
                 <!-- KẾT LUẬN -->
@@ -973,8 +959,8 @@ function renderReports() {
 
         </div>
       `;
-        })
-        .join("");
+    })
+    .join("");
 }
 
 // ===============================
@@ -982,9 +968,9 @@ function renderReports() {
 // ===============================
 
 function createDevice(name, status, count = null) {
-    const isOn = status === "Bật";
+  const isOn = status === "Bật";
 
-    return `
+  return `
     <div class="col-6 col-md-4">
 
       <div
@@ -1014,7 +1000,7 @@ function createDevice(name, status, count = null) {
         </strong>
 
         ${count
-            ? `
+      ? `
               <small
                 class="
                   text-muted
@@ -1024,8 +1010,8 @@ function createDevice(name, status, count = null) {
                 (${count} máy)
               </small>
             `
-            : ""
-        }
+      : ""
+    }
 
       </div>
 
@@ -1038,20 +1024,14 @@ function createDevice(name, status, count = null) {
 // ===============================
 
 async function init() {
-    try {
-        // Đọc toàn bộ dữ liệu từ IndexedDB
-        reports = await getReports();
+  try {
+    // Đọc toàn bộ dữ liệu từ IndexedDB
+    await refreshViewerData();
+  } catch (error) {
+    console.error("Không thể mở IndexedDB:", error);
 
-        // Mới nhất lên đầu
-        reports.reverse();
-
-        updateEnergyHighlights(reports);
-        renderReports();
-    } catch (error) {
-        console.error("Không thể mở IndexedDB:", error);
-
-        alert("Không thể tải dữ liệu báo cáo!");
-    }
+    alert("Không thể tải dữ liệu báo cáo!");
+  }
 }
 
 init();

@@ -25,8 +25,8 @@
       <button class="menu-toggle" id="menu-toggle" aria-label="Mở menu">☰</button>
       <nav id="nav-menu">
         <a href="index.html">Trang chủ</a>
-        <a href="#thu-thach">Thử thách</a>
-        <a href="#nhat-ky">Nhật ký lớp</a>
+        <a href="#xep-hang">Bảng xếp hạng</a>
+        <a href="#nhat-ky">Nhật ký hoạt động</a>
         <a href="admin.html" class="nav-admin-btn">Cổng giáo viên <span>↗</span></a>
       </nav>
     </header>
@@ -36,10 +36,10 @@
 
       <section class="student-hero">
         <div class="student-hero-copy">
-          <span class="student-kicker">GÓC HỌC SINH · TUẦN 04</span>
-          <h1>Lớp mình hôm nay<br /><em>đã xanh đến đâu?</em></h1>
-          <p>Mỗi lần tắt một thiết bị đúng lúc là một điểm cộng cho lớp học và một bước tiến cho ngôi trường.</p>
-          <a href="#thu-thach" class="student-primary-btn">Bắt đầu thử thách <span>↓</span></a>
+          <span class="student-kicker">GÓC HỌC SINH · HÀNH ĐỘNG MỖI NGÀY</span>
+          <h1>Chúng ta<br /><em>đã xanh đến đâu?</em></h1>
+          <p>Mỗi lần tắt một thiết bị đúng lúc là một bước tiến cho cả cộng đồng Việt Đức.</p>
+          <a href="#xep-hang" class="student-primary-btn">Xem bảng xếp hạng <span>↓</span></a>
         </div>
         <div class="student-score-card">
           <div class="score-topline"><span>ĐIỂM XANH CỦA LỚP</span><span class="score-live">● ĐANG CẬP NHẬT</span></div>
@@ -56,18 +56,15 @@
         <div><span>₫</span><strong id="student-saved-vnd">7.125 đ</strong><small>Chi phí tiết kiệm ước tính</small></div>
       </section>
 
-      <section id="thu-thach" class="student-challenge">
+      <section id="xep-hang" class="student-ranking">
         <div class="student-section-heading">
-          <div><span class="student-kicker">01 / NHIỆM VỤ HÔM NAY</span><h2>Thử thách<br /><em>30 giây xanh.</em></h2></div>
-          <p>Hoàn thành từng việc nhỏ trước khi rời lớp. Không cần hoàn hảo, chỉ cần cùng nhau bắt đầu.</p>
+          <div><span class="student-kicker">01 / TINH THẦN THI ĐUA</span><h2>Bảng xếp hạng<br /><em>hành động xanh.</em></h2></div>
+          <p>Điểm số được tổng hợp từ các báo cáo đã xác nhận. Cùng nhìn lại tiến bộ và lan tỏa cách làm tốt.</p>
         </div>
-        <div class="challenge-grid">
-          <button class="challenge-item" type="button"><span class="challenge-number">01</span><span class="challenge-check">✓</span><strong>Tắt đèn</strong><small>khi phòng không còn ai</small></button>
-          <button class="challenge-item" type="button"><span class="challenge-number">02</span><span class="challenge-check">✓</span><strong>Tắt quạt</strong><small>trước giờ ra chơi</small></button>
-          <button class="challenge-item" type="button"><span class="challenge-number">03</span><span class="challenge-check">✓</span><strong>Kiểm tra điều hòa</strong><small>trước khi rời lớp</small></button>
-          <button class="challenge-item" type="button"><span class="challenge-number">04</span><span class="challenge-check">✓</span><strong>Nhắc một người bạn</strong><small>cùng giữ thói quen xanh</small></button>
+        <div class="ranking-table">
+          <div class="ranking-header"><span>Hạng</span><span>Lớp / nhóm</span><span>Điểm xanh</span><span>Xu hướng</span></div>
+          <div id="rankingList"><div class="ranking-empty">Bảng xếp hạng sẽ xuất hiện khi có báo cáo được xác nhận.</div></div>
         </div>
-        <div class="challenge-progress"><div><strong id="challenge-count">0/4</strong><span> nhiệm vụ đã hoàn thành</span></div><div class="challenge-bar"><span id="challenge-bar-fill"></span></div></div>
       </section>
 
       <section class="student-message">
@@ -92,16 +89,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="effect.js"></script>
     <script src="json_viewer.js"></script>
-    <script>
-      const challengeItems = document.querySelectorAll('.challenge-item');
-      const challengeCount = document.getElementById('challenge-count');
-      const challengeBar = document.getElementById('challenge-bar-fill');
-      challengeItems.forEach((item) => item.addEventListener('click', () => {
-        item.classList.toggle('complete');
-        const completed = document.querySelectorAll('.challenge-item.complete').length;
-        challengeCount.textContent = `${completed}/4`;
-        challengeBar.style.width = `${completed * 25}%`;
-      }));
-    </script>
   </body>
 </html>
