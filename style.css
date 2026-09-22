@@ -205,7 +205,7 @@ nav a:hover {
 .report-time {
     display: inline-block;
     margin-left: 12px;
-    font-size: 15px;
+    font-size: 13px;
     color: #777;
     font-weight: normal;
 }
@@ -338,7 +338,7 @@ nav a:hover {
     font-weight: bold;
     margin-bottom: 6px;
     color: #2e7d32;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .form-grid {
@@ -354,7 +354,7 @@ nav a:hover {
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     box-sizing: border-box;
 }
 
@@ -411,7 +411,7 @@ footer {
     text-align: center;
     padding: 25px 20px;
     margin-top: 50px;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* --- RESPONSIVE MOBILE --- */
@@ -497,7 +497,7 @@ footer {
 .btn-primary:hover,
 .btn-partyrock-admin:hover {
     transform: translateY(-3px) scale(1.02) !important;
-    /* box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4) !important; */
+    box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4) !important;
 }
 
 /* 4. Thẻ nội dung (Card) hiệu ứng nâng khối & phát sáng viền nhẹ */
@@ -2777,16 +2777,16 @@ body:not(.admin-page) .section-kicker {
 }
 
 body:not(.admin-page) .hero-note {
-    font-size: 15px;
+    font-size: 13px;
 }
 
 body:not(.admin-page) .panel-topline,
 body:not(.admin-page) .panel-bottomline {
-    font-size: 15px;
+    font-size: 12px;
 }
 
 body:not(.admin-page) .status-pill {
-    font-size: 15px;
+    font-size: 11px;
 }
 
 body:not(.admin-page) .energy-label {
@@ -2794,21 +2794,18 @@ body:not(.admin-page) .energy-label {
 }
 
 body:not(.admin-page) .floating-chip small {
-    font-size: 15px;
+    font-size: 11px;
 }
 
 body:not(.admin-page) .hero-scroll {
-    font-size: 15px;
+    font-size: 11px;
 }
 
 body:not(.admin-page) .impact-item {
-    font-size: 15px;
+    font-size: 13px;
 }
 
-body:not(.admin-page) .section-heading p {
-    font-size: 20px;
-}
-
+body:not(.admin-page) .section-heading p,
 body:not(.admin-page) .report-intro p {
     font-size: 15px;
 }
@@ -2819,13 +2816,9 @@ body:not(.admin-page) .community-copy>p {
     font-size: 16px;
 }
 
-body:not(.admin-page) .process-step p {
-    font-size: 20px;
-}
-
 body:not(.admin-page) .text-link,
 body:not(.admin-page) .community-link {
-    font-size: 15px;
+    font-size: 14px;
 }
 
 body:not(.admin-page) .habit-item p,
@@ -2835,19 +2828,15 @@ body:not(.admin-page) .habit-poster p {
 
 body:not(.admin-page) .footer-inner p,
 body:not(.admin-page) .footer-inner a {
-    font-size: 15px;
+    font-size: 12px;
 }
 
 @media screen and (max-width: 768px) {
     body:not(.admin-page) .impact-item {
-        font-size: 15px;
+        font-size: 11px;
     }
 
     body:not(.admin-page) .section-heading p,
-    body:not(.admin-page) .process-step p {
-        font-size: 20px;
-    }
-
     body:not(.admin-page) .report-intro p,
     body:not(.admin-page) .issue-card p,
     body:not(.admin-page) .process-step p,
@@ -2927,7 +2916,7 @@ body:not(.admin-page) .footer-inner a {
 .report-eyebrow {
     margin-bottom: 5px;
     color: #91a098;
-    font-size: 15px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.3px;
 }
@@ -2941,13 +2930,13 @@ body:not(.admin-page) .footer-inner a {
 
 .report-context {
     color: var(--muted) !important;
-    font-size: 15px !important;
+    font-size: 13px !important;
 }
 
 .report-meta {
     margin-top: 5px;
     color: #a1ada6 !important;
-    font-size: 15px !important;
+    font-size: 11px !important;
 }
 
 .report-level {
@@ -2955,7 +2944,7 @@ body:not(.admin-page) .footer-inner a {
     border: 1px solid transparent;
     border-radius: 6px !important;
     padding: 8px 10px !important;
-    font-size: 15px !important;
+    font-size: 10px !important;
     font-weight: 800 !important;
     letter-spacing: .5px;
     text-align: center;
@@ -3002,20 +2991,20 @@ body:not(.admin-page) .footer-inner a {
 .report-card-content h6 {
     color: var(--forest);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 15px;
+    font-size: 13px;
     letter-spacing: -.1px;
 }
 
 .report-card-content .text-muted.small,
 .report-card-content .text-muted {
     color: #84928b !important;
-    font-size: 15px !important;
+    font-size: 12px !important;
 }
 
 .report-card-content .fw-medium,
 .report-card-content .fw-bold {
     color: var(--ink);
-    font-size: 15px;
+    font-size: 13px;
 }
 
 .report-card-content .fs-3 {
@@ -3061,7 +3050,7 @@ body:not(.admin-page) .footer-inner a {
 
 .report-impact-item span {
     color: #6d8274;
-    font-size: 15px;
+    font-size: 10px;
     line-height: 1.35;
 }
 

@@ -7,6 +7,9 @@ const DB_VERSION = 1;
 const STORE_NAME = "reports";
 
 let reports = [];
+const reportsChannel = typeof BroadcastChannel !== "undefined"
+  ? new BroadcastChannel("green-viet-duc-reports")
+  : null;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -88,6 +91,28 @@ function formatCurrency(value) {
   return `${Number(value || 0).toLocaleString("vi-VN")} đ`;
 }
 
+function getReportTimestamp(report) {
+  const session = report.phien || {};
+  const date = String(session.ngayKiemTra || "").trim();
+  const time = String(session.thoiDiemKiemTra || "00:00").trim();
+  const match = date.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+
+  if (!match) {
+    return 0;
+  }
+
+  const [, day, month, year] = match;
+  const [hours = "0", minutes = "0"] = time.split(":");
+  return new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes)).getTime();
+}
+
+function sortReportsNewestFirst(reportItems) {
+  return [...reportItems].sort((first, second) => {
+    const timestampDifference = getReportTimestamp(second) - getReportTimestamp(first);
+    return timestampDifference || String(second.id || "").localeCompare(String(first.id || ""));
+  });
+}
+
 function updateEnergyHighlights(reportItems) {
   const savedWh = reportItems.reduce(
     (total, report) => total + Number(report.ketQua?.uocTinhTietKiem_Wh || 0),
@@ -102,6 +127,25 @@ function updateEnergyHighlights(reportItems) {
   const studentVnd = document.getElementById("student-saved-vnd");
   const savedVndLabel = document.getElementById("energy-saved-vnd");
   const reportCountLabel = document.getElementById("energy-report-count");
+  const scoreLabel = document.getElementById("energy-score");
+  const meterFill = document.getElementById("energy-meter-fill");
+  const classCountLabel = document.getElementById("energy-class-count");
+  const scoredReports = reportItems
+    .map((report) => {
+      const result = report.ketQua || {};
+      if (result.diemThiDua !== undefined) return Number(result.diemThiDua);
+      if (result.diemBiTru !== undefined) return 100 - Number(result.diemBiTru);
+      return null;
+    })
+    .filter((score) => Number.isFinite(score));
+  const averageScore = scoredReports.length
+    ? Math.round(scoredReports.reduce((total, score) => total + score, 0) / scoredReports.length)
+    : 0;
+  const classCount = new Set(
+    reportItems
+      .map((report) => String(report.phien?.lopNhom || "").trim().toLocaleLowerCase("vi-VN"))
+      .filter(Boolean),
+  ).size;
 
   if (savedKwh) savedKwh.textContent = formatEnergy(savedWh);
   if (studentKwh) studentKwh.textContent = formatEnergy(savedWh);
