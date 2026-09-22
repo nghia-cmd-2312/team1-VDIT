@@ -2047,7 +2047,7 @@ footer {
     max-width: 530px;
     margin: 0;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.8;
 }
 
@@ -2133,13 +2133,13 @@ footer {
 .admin-stat strong {
     color: var(--forest);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 21px;
+    font-size: 23px;
 }
 
 .admin-stat small {
     margin-top: 2px;
     color: var(--muted);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .admin-stat b {
@@ -2173,7 +2173,7 @@ footer {
     align-items: center;
     gap: 8px;
     color: var(--lime);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 800;
     letter-spacing: 1.5px;
 }
@@ -2200,7 +2200,7 @@ footer {
     max-width: 440px;
     margin-bottom: 24px;
     color: rgba(255, 255, 255, .6);
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.8;
 }
 
@@ -2215,7 +2215,7 @@ footer {
     padding: 13px 17px;
     box-shadow: none;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .btn-partyrock-admin span {
@@ -2302,13 +2302,13 @@ footer {
 
 .admin-danger-row strong {
     color: #794439;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .admin-danger-row span {
     margin-top: 3px;
     color: #aa8880;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .admin-page .btn-danger {
@@ -2321,7 +2321,7 @@ footer {
     color: #ad4b3e;
     border: 1px solid rgba(181, 71, 54, .24);
     font-family: inherit;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .admin-page .btn-danger:hover {
@@ -2388,7 +2388,7 @@ footer {
     align-items: center;
     gap: 10px;
     color: var(--forest);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -2408,7 +2408,7 @@ footer {
     border-radius: 6px;
     padding: 9px 12px;
     font-family: inherit;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -2420,7 +2420,7 @@ footer {
 .admin-page .toolbar .btn-primary {
     padding: 9px 12px;
     box-shadow: none;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .btn-save {
@@ -2467,7 +2467,7 @@ footer {
     display: block;
     color: var(--forest);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
+    font-size: 20px;
 }
 
 .aside-heading small,
@@ -2475,7 +2475,7 @@ footer {
     display: block;
     margin-top: 4px;
     color: var(--muted);
-    font-size: 9px;
+    font-size: 13px;
 }
 
 .aside-heading>span {
@@ -2496,7 +2496,7 @@ footer {
     background: #f0f5ed;
     color: #6c9062;
     font-family: monospace;
-    font-size: 9px;
+    font-size: 13px;
 }
 
 .admin-page #jsonInput {
@@ -2528,7 +2528,7 @@ footer {
 .editor-footer p {
     margin: 10px 0 0;
     color: #5d8160;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .editor-footer>span {
@@ -2561,14 +2561,14 @@ footer {
 
 .admin-page .report-title {
     color: var(--forest);
-    font-size: 11px;
+    font-size: 15px;
 }
 
 .admin-page .report-time {
     display: block;
     margin: 4px 0 0 24px;
     color: var(--muted);
-    font-size: 9px;
+    font-size: 11px;
 }
 
 .admin-page .report-detail {
@@ -2579,7 +2579,7 @@ footer {
 .admin-page .detail-content p {
     margin: 6px 0;
     color: var(--muted);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .admin-page .empty-msg {
@@ -2991,20 +2991,20 @@ body:not(.admin-page) .footer-inner a {
 .report-card-content h6 {
     color: var(--forest);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: -.1px;
 }
 
 .report-card-content .text-muted.small,
 .report-card-content .text-muted {
     color: #84928b !important;
-    font-size: 12px !important;
+    font-size: 14px !important;
 }
 
 .report-card-content .fw-medium,
 .report-card-content .fw-bold {
     color: var(--ink);
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .report-card-content .fs-3 {
@@ -3050,7 +3050,7 @@ body:not(.admin-page) .footer-inner a {
 
 .report-impact-item span {
     color: #6d8274;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.35;
 }
 
