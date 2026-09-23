@@ -29,9 +29,13 @@
         <a href="#thuc-trang">Vấn đề</a>
         <a href="#quy-trinh">Cách hoạt động</a>
         <a href="#thoi-quen">Thói quen xanh</a>
-        <a href="student.html">Góc học sinh</a>
-        <a href="#danh-sach-bao-cao">Báo cáo</a>
-        <a href="admin.html" class="nav-admin-btn">Cổng giáo viên <span>↗</span></a>
+        <a href="#trai-nghiem">Trải nghiệm</a>
+        <a href="student.html" class=""
+          >Góc học sinh <span>↗</span></a
+        >
+        <a href="admin.html" class="nav-admin-btn"
+          >Cổng giáo viên <span>↗</span></a
+        >
       </nav>
     </header>
 
@@ -40,116 +44,355 @@
         <div class="hero-grid">
           <div class="banner-content">
             <div class="eyebrow"><span></span> Dự án xanh · THPT Việt Đức</div>
-            <h1>Cùng AI <em>tiết kiệm điện</em>, thi đua <em>xanh</em></h1>
+            <h1>
+              Biến mỗi lần <em class="text-nowrap">tắt điện</em> thành một hành
+              động xanh.
+            </h1>
             <p>
-              Green Việt Đức giúp học sinh hình thành thói quen tiết kiệm điện, đồng thời hỗ trợ giáo viên <b>đánh giá, theo dõi và lưu trữ dữ liệu thi đua</b> một cách rõ ràng, thuận tiện để cùng xây dựng một ngôi trường hiệu quả hơn.
+              Green Việt Đức giúp học sinh nhìn thấy tác động của thói quen sử
+              dụng điện, còn giáo viên có dữ liệu rõ ràng để cùng xây dựng một
+              ngôi trường hiệu quả hơn.
             </p>
             <div class="hero-actions">
-              <a href="#danh-sach-bao-cao" class="btn-primary">Xem báo cáo mới nhất <span>→</span></a>
-              <a href="#thuc-trang" class="btn-secondary">Khám phá dự án <span>↓</span></a>
+              <a href="#trai-nghiem" class="btn-primary"
+                >Chọn trải nghiệm <span>→</span></a
+              >
+              <a href="#quy-trinh" class="btn-secondary"
+                >Khám phá dự án <span>↓</span></a
+              >
             </div>
-            <div class="hero-note"><span class="live-dot"></span> Đang theo dõi hoạt động tiết kiệm điện trong trường</div>
           </div>
 
-          <div class="hero-visual" aria-label="Tổng quan hoạt động tiết kiệm điện">
+          <div
+            class="hero-visual"
+            aria-label="Tổng quan hoạt động tiết kiệm điện"
+          >
             <div class="visual-orbit orbit-one"></div>
-            <div class="visual-orbit orbit-two"></div>
+            <div class="visual-orbit norbit-two"></div>
             <div class="energy-panel">
-              <div class="panel-topline"><span>Chỉ số hôm nay</span><span class="status-pill">● Đang hoạt động</span></div>
-              <div class="energy-number">78<span>%</span></div>
+              <div class="panel-topline">
+                <span>Chỉ số hôm nay</span
+                ><span class="status-pill">● Đang hoạt động</span>
+              </div>
+              <div class="energy-number">
+                <span id="energy-score">0</span><span>%</span>
+              </div>
               <div class="energy-label">mức độ chủ động tiết kiệm</div>
-              <div class="meter"><span></span></div>
-              <div class="panel-bottomline"><span id="energy-saved-vnd">Tiết kiệm 7.125 đ</span><span id="energy-report-count">Tuần 04</span></div>
+              <div class="meter"><span id="energy-meter-fill"></span></div>
+              <div class="panel-bottomline">
+                <span id="energy-saved-vnd">Tiết kiệm 0 đ</span
+                ><span id="energy-report-count">0 báo cáo</span>
+              </div>
             </div>
-            <div class="floating-chip chip-save"><span>↗</span><strong id="energy-saved-kwh">2,38 kWh</strong><small>điện đã tiết kiệm</small></div>
-            <div class="floating-chip chip-class"><span>★</span><strong>3 lớp</strong><small>đã ghi nhận</small></div>
+            <div class="floating-chip chip-save">
+              <span>↗</span><strong id="energy-saved-kwh">2,38 kWh</strong
+              ><small>điện đã tiết kiệm</small>
+            </div>
+            <div class="floating-chip chip-class">
+              <span>★</span><strong id="energy-class-count">0 lớp</strong
+              ><small>đã ghi nhận</small>
+            </div>
           </div>
         </div>
         <div class="hero-scroll">Cuộn để khám phá <span>↓</span></div>
       </section>
 
       <section class="impact-strip" aria-label="Tổng quan dự án">
-        <div class="impact-item"><strong>01</strong><span>Trường học<br />cùng hành động</span></div>
-        <div class="impact-item"><strong>24/7</strong><span>Ghi nhận<br />minh bạch</span></div>
-        <div class="impact-item"><strong>AI</strong><span>Phân tích<br />nhanh chóng</span></div>
-        <div class="impact-item impact-quote"><span>“Tiết kiệm hôm nay,<br /><strong>tương lai xanh hơn.”</strong></span><i>↗</i></div>
-      </section>
-
-      <section id="danh-sach-bao-cao" class="content-section report-section">
-        <div class="report-heading section-heading reveal">
-          <div class="report-intro"><span class="report-live"></span><p>Dữ liệu được cập nhật bởi giáo viên và ban thi đua. Nhấp vào từng báo cáo để xem chi tiết.</p></div>
+        <div class="impact-item">
+          <strong>01</strong><span>Trường học<br />cùng hành động</span>
         </div>
-        <div id="reportList" class="row g-3 mt-3 report-list-wrap"></div>
+        <div class="impact-item">
+          <strong>24/7</strong><span>Ghi nhận<br />minh bạch</span>
+        </div>
+        <div class="impact-item">
+          <strong>AI</strong><span>Phân tích<br />nhanh chóng</span>
+        </div>
+        <div class="impact-item impact-quote">
+          <span
+            >“Tiết kiệm hôm nay,<br /><strong
+              >tương lai xanh hơn.”</strong
+            ></span
+          ><i>↗</i>
+        </div>
       </section>
 
       <section id="thuc-trang" class="content-section story-section">
         <div class="section-heading reveal">
-          <div><span class="section-kicker">01 / Vì sao cần thay đổi?</span><h2>Nhìn đúng vấn đề<br /><em>để tạo khác biệt.</em></h2></div>
-          <p>Những thay đổi nhỏ trong lớp học có thể tạo ra tác động lớn khi cả cộng đồng cùng tham gia.</p>
+          <div>
+            <span class="section-kicker">01 / Vì sao cần thay đổi?</span>
+            <h2>Thay đổi nhỏ, <br /><em>Khác biệt lớn.</em></h2>
+          </div>
+          <p>
+            Những thay đổi nhỏ trong lớp học có thể tạo ra tác động lớn khi cả
+            tập thể cùng tham gia.
+          </p>
         </div>
         <div class="cards-grid issue-grid">
-          <article class="card issue-card reveal"><div class="card-index">01</div><div class="card-icon">⚡</div><h3>Năng lượng bị bỏ quên</h3><p>Đèn, quạt và điều hòa vẫn hoạt động khi phòng trống hoặc trong giờ ra chơi, tạo ra khoản lãng phí âm thầm mỗi ngày.</p><a href="#quy-trinh" class="text-link">Xem giải pháp <span>↗</span></a></article>
-          <article class="card issue-card reveal"><div class="card-index">02</div><div class="card-icon">◎</div><h3>Dữ liệu chưa liền mạch</h3><p>Việc ghi nhận thủ công khiến nhà trường khó nhìn ra xu hướng, so sánh giữa các lớp và khen thưởng kịp thời.</p><a href="#danh-sach-bao-cao" class="text-link">Xem dữ liệu <span>↗</span></a></article>
-          <article class="card issue-card issue-card-dark reveal"><div class="card-index">03</div><div class="card-icon">✦</div><h3>Ý thức cần một cú hích</h3><p>Khi hành động được ghi nhận và biến thành điểm thi đua, tiết kiệm điện trở thành một mục tiêu chung đầy hào hứng.</p><a href="#quy-trinh" class="text-link">Bắt đầu ngay <span>↗</span></a></article>
+          <article class="card issue-card reveal">
+            <div class="card-index">01</div>
+            <div class="card-icon">⚡</div>
+            <h3>Lãng phí điện năng ngầm</h3>
+            <p>
+              Đèn, quạt hay điều hòa vẫn bật ngay cả khi giờ ra chơi hoặc phòng
+              không có người – tạo nên khoản chi phí lãng phí không nhỏ mỗi
+              ngày.
+            </p>
+            <a href="#quy-trinh" class="text-link"
+              >Khám phá giải pháp <span>↗</span></a
+            >
+          </article>
+          <article class="card issue-card reveal">
+            <div class="card-index">02</div>
+            <div class="card-icon">◎</div>
+            <h3>Dữ liệu rời rạc, thiếu kết nối</h3>
+            <p>
+              Ghi nhận bằng tay làm nhà trường khó theo dõi xu hướng, khó so
+              sánh thi đua giữa các lớp và khen thưởng đúng thời điểm.
+            </p>
+            <a href="#trai-nghiem" class="text-link"
+              >Trải nghiệm ngay <span>↗</span></a
+            >
+          </article>
+          <article class="card issue-card issue-card-dark reveal">
+            <div class="card-index">03</div>
+            <div class="card-icon">✦</div>
+            <h3>Động lực thay đổi thói quen</h3>
+            <p>
+              Khi mọi hành động tích cực được ghi nhận và tính vào điểm thi đua,
+              việc tiết kiệm điện sẽ trở thành mục tiêu chung đầy hứng khởi của
+              học sinh.
+            </p>
+            <a href="#quy-trinh" class="text-link"
+              >Bắt đầu ngay <span>↗</span></a
+            >
+          </article>
         </div>
       </section>
 
       <section id="quy-trinh" class="process-section">
         <div class="content-section process-inner">
           <div class="section-heading light-heading reveal">
-            <div><span class="section-kicker">02 / Cách Green Việt Đức hoạt động</span><h2>Từ quan sát<br /><em>đến hành động.</em></h2></div>
-            <p>Một quy trình gọn gàng để mọi thành viên đều biết mình có thể làm gì cho lớp học.</p>
+            <div>
+              <span class="section-kicker"
+                >02 / Cách Green Việt Đức hoạt động</span
+              >
+              <h2>Biến nhận thức <br /><em>thành hành động.</em></h2>
+            </div>
+            <p>
+              Quy trình đơn giản, nhất quán giúp nhà trường, giáo viên, học sinh
+              dễ dàng theo dõi, đóng góp
+            </p>
           </div>
           <div class="process-grid">
-            <div class="process-step reveal"><span>01</span><div class="step-line"></div><h3>Quan sát</h3><p>Kiểm tra thiết bị và thói quen sử dụng điện tại từng phòng học.</p></div>
-            <div class="process-step reveal"><span>02</span><div class="step-line"></div><h3>Ghi nhận</h3><p>Thông tin được cập nhật thành báo cáo rõ ràng, dễ theo dõi.</p></div>
-            <div class="process-step reveal"><span>03</span><div class="step-line"></div><h3>Cải thiện</h3><p>Cùng nhìn lại kết quả, thi đua công bằng và duy trì thói quen tốt.</p></div>
+            <div class="process-step reveal">
+              <span>01</span>
+              <div class="step-line"></div>
+              <h3>Quan sát</h3>
+              <p>
+                Kiểm tra thiết bị và thói quen sử dụng điện tại từng phòng học.
+              </p>
+            </div>
+            <div class="process-step reveal">
+              <span>02</span>
+              <div class="step-line"></div>
+              <h3>Ghi nhận</h3>
+              <p>Thông tin được cập nhật thành báo cáo rõ ràng, dễ theo dõi.</p>
+            </div>
+            <div class="process-step reveal">
+              <span>03</span>
+              <div class="step-line"></div>
+              <h3>Cải thiện</h3>
+              <p>
+                Cùng nhìn lại kết quả, thi đua công bằng và duy trì thói quen
+                tốt.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="thoi-quen" class="habits-section content-section">
         <div class="section-heading reveal">
-          <div><span class="section-kicker">03 / Bắt đầu từ hôm nay</span><h2>30 giây nhỏ,<br /><em>tác động lớn.</em></h2></div>
-          <p>Một checklist đơn giản trước khi rời phòng có thể giúp cả lớp hình thành thói quen tốt mỗi ngày.</p>
+          <div>
+            <span class="section-kicker">03 / Bắt đầu từ hôm nay</span>
+            <h2>30 giây nhỏ,<br /><em>tác động lớn.</em></h2>
+          </div>
+          <p>
+            Một checklist đơn giản trước khi rời phòng có thể giúp cả lớp hình
+            thành thói quen tốt mỗi ngày.
+          </p>
         </div>
         <div class="habits-layout">
           <div class="habit-list reveal">
-            <div class="habit-item"><span class="habit-check">01</span><div><strong>Tắt đèn khi phòng trống</strong><p>Kiểm tra công tắc trước mỗi lần ra khỏi lớp.</p></div><span class="habit-arrow">↗</span></div>
-            <div class="habit-item"><span class="habit-check">02</span><div><strong>Tắt quạt và điều hòa</strong><p>Đặc biệt trong giờ ra chơi hoặc khi chuyển tiết.</p></div><span class="habit-arrow">↗</span></div>
-            <div class="habit-item"><span class="habit-check">03</span><div><strong>Báo cáo điều bất thường</strong><p>Ghi nhận thiết bị hỏng hoặc tiêu thụ điện bất hợp lý.</p></div><span class="habit-arrow">↗</span></div>
-            <div class="habit-item"><span class="habit-check">04</span><div><strong>Nhắc nhau bằng tinh thần tích cực</strong><p>Lan tỏa hành động xanh, không phê bình hay đổ lỗi.</p></div><span class="habit-arrow">↗</span></div>
+            <div class="habit-item">
+              <span class="habit-check">01</span>
+              <div>
+                <strong>Tắt đèn khi phòng trống</strong>
+                <p>Kiểm tra công tắc trước mỗi lần ra khỏi lớp.</p>
+              </div>
+              <span class="habit-arrow">↗</span>
+            </div>
+            <div class="habit-item">
+              <span class="habit-check">02</span>
+              <div>
+                <strong>Tắt quạt và điều hòa</strong>
+                <p>Đặc biệt trong giờ không ở trên lớp.</p>
+              </div>
+              <span class="habit-arrow">↗</span>
+            </div>
+            <div class="habit-item">
+              <span class="habit-check">03</span>
+              <div>
+                <strong>Báo cáo điều bất thường</strong>
+                <p>Ghi nhận thiết bị hỏng hoặc tiêu thụ điện bất hợp lý.</p>
+              </div>
+              <span class="habit-arrow">↗</span>
+            </div>
+            <div class="habit-item">
+              <span class="habit-check">04</span>
+              <div>
+                <strong>Nhắc nhau bằng tinh thần tích cực</strong>
+                <p>Lan tỏa hành động xanh, không đùn đẩy trách nhiệm.</p>
+              </div>
+              <span class="habit-arrow">↗</span>
+            </div>
           </div>
           <div class="habit-poster reveal">
             <div class="poster-glow"></div>
             <span class="poster-label">LỜI NHẮC MỖI NGÀY</span>
             <div class="poster-icon">◌</div>
             <h3>Rời phòng<br /><em>đừng quên nhìn lại.</em></h3>
-            <p>Đèn · Quạt · Điều hòa<br />Một lần kiểm tra. Một thói quen tốt.</p>
+            <p>
+              Đèn · Quạt · Điều hòa<br />Một lần kiểm tra. Một thói quen tốt.
+            </p>
             <div class="poster-stamp">GREEN<br /><strong>VĐ</strong></div>
           </div>
         </div>
       </section>
 
-      <section class="community-section">
-        <div class="community-inner content-section">
-          <div class="community-copy reveal">
-            <span class="section-kicker">04 / Sức mạnh cộng đồng</span>
-            <h2>Một ngôi trường xanh<br /><em>bắt đầu từ chúng ta.</em></h2>
-            <p>Không cần chờ một chiến dịch lớn. Khi mỗi lớp cùng quan sát, ghi nhận và nhắc nhau, năng lượng tiết kiệm được sẽ trở thành kết quả của cả cộng đồng.</p>
-            <a href="#danh-sach-bao-cao" class="community-link">Theo dõi hành trình của các lớp <span>→</span></a>
+      <section class="showcase-section">
+        <div class="showcase-inner content-section">
+          <div class="section-heading reveal">
+            <div>
+              <span class="section-kicker">04 / Xem trước trải nghiệm</span>
+              <h2>Một hệ thống,<br /><em>hai góc nhìn.</em></h2>
+            </div>
+            <p>
+              Khám phá nhanh không gian dành cho học sinh và giáo viên trước khi
+              mở trang đầy đủ.
+            </p>
           </div>
-          <div class="community-metrics reveal">
-            <div class="metric-row"><strong>01</strong><span>Học sinh<br />chủ động</span><b>↗</b></div>
-            <div class="metric-row"><strong>02</strong><span>Giáo viên<br />đồng hành</span><b>↗</b></div>
-            <div class="metric-row"><strong>03</strong><span>Môi trường<br />bền vững</span><b>↗</b></div>
+          <div class="showcase-list">
+            <a class="showcase-row reveal" href="student.html">
+              <div class="showcase-copy">
+                <span class="showcase-label">DÀNH CHO HỌC SINH · 01</span>
+                <h3>Góc học sinh</h3>
+                <p>
+                  Giao diện trực quan, dễ dàng xem thi đua, báo cáo chi tiết
+                </p>
+                <span class="showcase-link"
+                  >Khám phá góc học sinh <strong>↗</strong></span
+                >
+              </div>
+              <div class="showcase-image">
+                <img
+                  src="screenshot.png"
+                  alt="Ảnh xem trước trang Góc học sinh"
+                  loading="lazy"
+                />
+              </div>
+            </a>
+            <a
+              class="showcase-row showcase-row-reverse reveal"
+              href="admin.html"
+            >
+              <div class="showcase-copy">
+                <span class="showcase-label">DÀNH CHO GIÁO VIÊN · 02</span>
+                <h3>Trung tâm <br> quản lý.</em></h3>
+                <p>
+                  Cập nhật báo cáo, dùng trợ lý AI và theo dõi dữ liệu năng
+                  lượng trong một không gian tập trung.
+                </p>
+                <span class="showcase-link"
+                  >Mở cổng giáo viên <strong>↗</strong></span
+                >
+              </div>
+              <div class="showcase-image">
+                <img
+                  src="screenshot2.png"
+                  alt="Ảnh xem trước Trung tâm điều hành giáo viên"
+                  loading="lazy"
+                />
+              </div>
+            </a>
           </div>
+        </div>
+      </section>
+
+      <section id="trai-nghiem" class="experience-section content-section">
+        <div class="section-heading reveal">
+          <div>
+            <span class="section-kicker">05 / Chọn trải nghiệm của bạn</span>
+            <h2>Mỗi vai trò,<br /><em>một cách tạo ảnh hưởng.</em></h2>
+          </div>
+          <p>
+            Đi đến đúng không gian để bắt đầu hành động xanh hoặc theo dõi dữ
+            liệu của nhà trường.
+          </p>
+        </div>
+        <div class="experience-grid">
+          <a
+            class="experience-card experience-student reveal"
+            href="student.html"
+          >
+            <div class="experience-card-top">
+              <span class="experience-number">01</span
+              ><span class="experience-icon">→</span>
+            </div>
+            <div class="experience-card-content">
+              <span class="experience-label">DÀNH CHO HỌC SINH</span>
+              <h3>Góc học sinh<br /><em>Xem báo cáo.</em></h3>
+              <p>
+                Xem điểm thi đua, thứ hạng và báo cáo chi tiết
+              </p>
+              <span class="experience-link"
+                >Khám phá góc học sinh <strong>↗</strong></span
+              >
+            </div>
+          </a>
+          <a
+            class="experience-card experience-teacher reveal"
+            href="admin.html"
+          >
+            <div class="experience-card-top">
+              <span class="experience-number">02</span
+              ><span class="experience-icon">→</span>
+            </div>
+            <div class="experience-card-content">
+              <span class="experience-label">DÀNH CHO GIÁO VIÊN</span>
+              <h3>Trung tâm quản lý<br /><em>Tạo báo cáo.</em></h3>
+              <p>
+                Cập nhật báo cáo, dùng trợ lý AI và nhìn lại hành trình tiết
+                kiệm năng lượng.
+              </p>
+              <span class="experience-link"
+                >Mở cổng giáo viên <strong>↗</strong></span
+              >
+            </div>
+          </a>
         </div>
       </section>
     </main>
 
     <footer>
-      <div class="footer-inner"><div class="logo footer-logo"><span class="logo-mark">G</span><span>Green <strong>Việt Đức</strong></span></div><p>© 2024 Dự án Ban IT - VDIT Gen 7 · Team 1 THPT Việt Đức</p><a href="#top">Về đầu trang ↑</a></div>
+      <div class="footer-inner">
+        <div class="logo footer-logo">
+          <span class="logo-mark">G</span
+          ><span>Green <strong>Việt Đức</strong></span>
+        </div>
+        <p>© 2024 Dự án Ban IT - VDIT Gen 7 · Team 1 THPT Việt Đức</p>
+        <a href="#top">Về đầu trang ↑</a>
+      </div>
     </footer>
 
     <!-- JavaScript Trang Học Sinh -->
