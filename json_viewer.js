@@ -650,7 +650,7 @@ function renderReports() {
 
                     </div>
 
-                    ${kq.uocTinhTietKiem_Wh !== undefined || kq.uocTinhLangPhi_Wh !== undefined || kq.uocTinhTietKiem_VND !== undefined
+                    ${kq.uocTinhTietKiem_Wh !== undefined || kq.uocTinhLangPhi_Wh !== undefined || kq.uocTinhTietKiem_VND !== undefined || kq.uocTinhLangPhi_VND !== undefined
           ? `
                       <div class="col-12">
                         <div class="report-impact-grid">
@@ -662,6 +662,9 @@ function renderReports() {
             : ""}
                           ${kq.uocTinhTietKiem_VND !== undefined
             ? `<div class="report-impact-item report-impact-money"><span>Chi phí tiết kiệm ước tính</span><strong>${formatCurrency(kq.uocTinhTietKiem_VND)}</strong></div>`
+            : ""}
+                          ${kq.uocTinhLangPhi_VND !== undefined
+            ? `<div class="report-impact-item report-impact-waste"><span>Chi phí lãng phí ước tính</span><strong>${formatCurrency(kq.uocTinhLangPhi_VND)}</strong></div>`
             : ""}
                         </div>
                       </div>

@@ -116,6 +116,11 @@ function getReportDate(report) {
         .join(" · ") || "Chưa có thời gian";
 }
 
+function formatCurrency(value) {
+    const num = Number(String(value ?? 0).replace(/[^\d.-]/g, "")) || 0;
+    return `${num.toLocaleString("vi-VN")} đ`;
+}
+
 function getReportTimestamp(report) {
     const session = report.phien || {};
     const date = String(session.ngayKiemTra || "").trim();
@@ -163,6 +168,7 @@ function renderReportList() {
         }
 
         const result = report.ketQua || {};
+        const wasteCost = result.uocTinhLangPhi_VND ?? result.uocTinhLangPhi ?? result.langPhiUocTinh ?? 0;
         card.innerHTML = `
             <div class="report-header">
                 <div class="report-title">
@@ -175,6 +181,7 @@ function renderReportList() {
                 <div class="detail-content">
                     <p><strong>⚡ Mức độ lãng phí:</strong> ${result.mucDoLangPhi || "N/A"}</p>
                     <p><strong>📉 Điểm thi đua:</strong> ${result.diemThiDua ?? "N/A"}</p>
+                    <p><strong>💸 Chi phí lãng phí ước tính:</strong> ${formatCurrency(wasteCost)}</p>
                     <p><strong>📝 Kết luận:</strong> ${report.ketLuan || "Không có dữ liệu"}</p>
                 </div>
             </div>
