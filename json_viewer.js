@@ -128,7 +128,9 @@ function updateEnergyHighlights(reportItems) {
   const savedVndLabel = document.getElementById("energy-saved-vnd");
   const reportCountLabel = document.getElementById("energy-report-count");
   const scoreLabel = document.getElementById("energy-score");
+  const scoreLabel2 = document.getElementById("energy-score-2");
   const meterFill = document.getElementById("energy-meter-fill");
+  const meterFill2 = document.getElementById("meterFill2")
   const classCountLabel = document.getElementById("energy-class-count");
   const scoredReports = reportItems
     .map((report) => {
@@ -153,7 +155,9 @@ function updateEnergyHighlights(reportItems) {
   if (savedVndLabel) savedVndLabel.textContent = `Tiết kiệm ${formatCurrency(savedVnd)}`;
   if (reportCountLabel) reportCountLabel.textContent = `${reportItems.length} báo cáo`;
   if (scoreLabel) scoreLabel.textContent = averageScore;
+  if (scoreLabel2) scoreLabel2.textContent = `${averageScore}%`
   if (meterFill) meterFill.style.width = `${averageScore}%`;
+  if (meterFill2) meterFill2.style.width = `${averageScore}%`;
   if (classCountLabel) classCountLabel.textContent = `${classCount} lớp`;
 }
 
